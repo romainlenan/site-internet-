@@ -1,0 +1,346 @@
+{%- comment -%}
+  Paddi · Nouveau hero
+  Titre centré sur le bénéfice, un seul bouton principal, prix visible, réglage de distance
+  interactif (la balle vole sur l'arc), garanties vraies. Aucune fausse urgence ni fausse preuve sociale.
+  Le bouton principal mène à la fiche produit, ou descend vers « Paddi · Commander » si elle est sur la page.
+{%- endcomment -%}
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.6 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.6 | round: 0 }}px;
+  }
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+{{ 'paddi-hero-v2.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'paddi-hero-v2.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign hv_product = section.settings.product
+  if hv_product == blank
+    assign hv_product = collections.all.products.first
+  endif
+
+  assign hv_image = section.settings.image
+  if hv_image == blank and hv_product != blank
+    assign hv_image = hv_product.featured_image
+  endif
+
+  assign hv_link = section.settings.button_link
+  if hv_link == blank
+    if hv_product != blank
+      assign hv_link = hv_product.url
+    else
+      assign hv_link = routes.all_products_collection_url
+    endif
+  endif
+
+  assign hv_default = section.settings.default_distance | default: '2'
+-%}
+
+<paddi-hero-v2
+  class="paddi-section paddi-hv color-{{ section.settings.color_scheme }} gradient"
+  data-distance="{{ hv_default }}"
+  {% if section.settings.scroll_to_buy %}data-scroll-target="{{ section.settings.scroll_target | default: 'choisir' | handleize }}"{% endif %}
+>
+  <div class="page-width section-{{ section.id }}-padding">
+    <div class="paddi-hv__grid">
+
+      {%- comment -%} Texte {%- endcomment -%}
+      <div class="paddi-hv__content">
+        <h1 class="paddi-hv__title">
+          {%- if section.settings.eyebrow != blank -%}
+            <span class="paddi-hv__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+          {%- endif -%}
+          <span class="paddi-hv__headline">{{ section.settings.heading }}</span>
+        </h1>
+
+        {%- if section.settings.text != blank -%}
+          <div class="paddi-hv__text">{{ section.settings.text }}</div>
+        {%- endif -%}
+
+        <div class="paddi-hv__actions">
+          {%- if section.settings.button_label != blank -%}
+            <a class="button button--primary paddi-hv__cta" href="{{ hv_link }}" data-hv-cta>
+              <span>{{ section.settings.button_label | escape }}</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          {%- endif -%}
+          {%- if section.settings.secondary_label != blank -%}
+            <a class="paddi-hv__secondary" href="{{ section.settings.secondary_link | default: '#demo' }}">
+              <span class="paddi-hv__play" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" focusable="false"><path d="M8 5.5v13l11-6.5z"/></svg>
+              </span>
+              {{ section.settings.secondary_label | escape }}
+            </a>
+          {%- endif -%}
+        </div>
+
+        {%- if section.settings.show_price and hv_product != blank -%}
+          <p class="paddi-hv__price">
+            <strong>{{ hv_product.price | money }}</strong>
+            {%- if section.settings.price_note != blank %}<span class="paddi-hv__sep" aria-hidden="true">·</span><span>{{ section.settings.price_note | escape }}</span>{% endif -%}
+            {%- if section.settings.show_colors -%}
+              {%- for option in hv_product.options_with_values -%}
+                {%- if option.values.size > 1 and option.values.first.swatch -%}
+                  <span class="paddi-hv__sep" aria-hidden="true">·</span>
+                  <span class="paddi-hv__colors">
+                    <span class="visually-hidden">{{ option.values.size }} {{ option.name | downcase | escape }}s :</span>
+                    {%- for value in option.values -%}
+                      {%- if value.swatch.color -%}
+                        <span class="paddi-hv__dot" style="background-color: rgb({{ value.swatch.color.rgb }});" title="{{ value | escape }}"></span>
+                      {%- endif -%}
+                      <span class="visually-hidden">{{ value | escape }}{% unless forloop.last %}, {% endunless %}</span>
+                    {%- endfor -%}
+                  </span>
+                  {%- break -%}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
+          </p>
+        {%- endif -%}
+
+        {%- if section.blocks.size > 0 -%}
+          <ul class="paddi-hv__trust" role="list">
+            {%- for block in section.blocks -%}
+              <li {{ block.shopify_attributes }}>
+                <span class="paddi-hv__trust-icon" aria-hidden="true">
+                  {%- case block.settings.icon -%}
+                    {%- when 'truck' -%}
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M3 6h11v9H3z"/><path d="M14 9h4l3 3v3h-7z"/><circle cx="7" cy="17" r="1.8"/><circle cx="17" cy="17" r="1.8"/></svg>
+                    {%- when 'return' -%}
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+                    {%- when 'shield' -%}
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+                    {%- when 'ball' -%}
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M4.6 7.4c3 1.6 3 7.6 0 9.2M19.4 7.4c-3 1.6-3 7.6 0 9.2"/></svg>
+                    {%- else -%}
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M5 12l5 5 9-10"/></svg>
+                  {%- endcase -%}
+                </span>
+                <span>{{ block.settings.text }}</span>
+              </li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      </div>
+
+      {%- comment -%} Visuel + réglage de distance {%- endcomment -%}
+      <div class="paddi-hv__visual">
+        {%- liquid
+          assign hv_ratio = section.settings.media_ratio
+          if hv_ratio == 'auto'
+            if section.settings.video != blank
+              assign hv_ratio = section.settings.video.aspect_ratio | default: 1.5
+            elsif hv_image != blank
+              assign hv_ratio = hv_image.aspect_ratio | default: 1.5
+            else
+              assign hv_ratio = 1.5
+            endif
+          endif
+        -%}
+        <div class="paddi-hv__media" style="--hv-ratio: {{ hv_ratio }};">
+          {%- if section.settings.video != blank -%}
+            {{
+              section.settings.video
+              | video_tag:
+                autoplay: true,
+                loop: true,
+                muted: true,
+                controls: false,
+                playsinline: true,
+                preload: 'metadata',
+                image_size: '1500x',
+                class: 'paddi-hv__video'
+            }}
+          {%- elsif hv_image != blank -%}
+            {%- assign hv_alt = hv_image.alt | default: section.settings.eyebrow -%}
+            {%- assign hv_focal = 'object-position: ' | append: hv_image.presentation.focal_point -%}
+            {{
+              hv_image
+              | image_url: width: 1800
+              | image_tag:
+                loading: 'eager',
+                fetchpriority: 'high',
+                widths: '480, 720, 960, 1200, 1500, 1800',
+                sizes: '(min-width: 990px) 52vw, 100vw',
+                style: hv_focal,
+                alt: hv_alt
+            }}
+          {%- else -%}
+            {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+          {%- endif -%}
+
+          {%- if section.settings.media_badge != blank -%}
+            <p class="paddi-hv__badge">{{ section.settings.media_badge | escape }}</p>
+          {%- endif -%}
+        </div>
+
+        {%- if section.settings.show_distance -%}
+          <div class="paddi-hv__distance color-{{ section.settings.card_color_scheme }}">
+            <fieldset class="paddi-hv__fieldset">
+              <legend class="paddi-hv__legend">{{ section.settings.distance_title | escape }}</legend>
+
+              <svg class="paddi-hv__arcs" viewBox="0 0 300 74" aria-hidden="true" focusable="false">
+                <line class="paddi-hv__ground" x1="16" y1="66" x2="292" y2="66"/>
+                <path class="paddi-hv__arc paddi-hv__arc--1" d="M34 44 Q72 14 110 60"/>
+                <path class="paddi-hv__arc paddi-hv__arc--2" d="M34 44 Q112 -8 190 60"/>
+                <path class="paddi-hv__arc paddi-hv__arc--3" d="M34 44 Q152 -30 270 60"/>
+                <circle class="paddi-hv__land paddi-hv__land--1" cx="110" cy="65" r="3"/>
+                <circle class="paddi-hv__land paddi-hv__land--2" cx="190" cy="65" r="3"/>
+                <circle class="paddi-hv__land paddi-hv__land--3" cx="270" cy="65" r="3"/>
+                <path class="paddi-hv__launcher" d="M20 66 L24 50 Q24 47 27 47 L41 47 Q44 47 44 50 L48 66 Z"/>
+                <circle class="paddi-hv__ball" cx="34" cy="44" r="6"/>
+              </svg>
+
+              <div class="paddi-hv__options">
+                {%- for i in (1..3) -%}
+                  {%- liquid
+                    case i
+                      when 1
+                        assign d_label = section.settings.d1_label
+                        assign d_text = section.settings.d1_text
+                      when 2
+                        assign d_label = section.settings.d2_label
+                        assign d_text = section.settings.d2_text
+                      else
+                        assign d_label = section.settings.d3_label
+                        assign d_text = section.settings.d3_text
+                    endcase
+                    assign d_value = i | append: ''
+                  -%}
+                  <input
+                    type="radio"
+                    class="paddi-hv__radio visually-hidden"
+                    id="{{ section.id }}-d{{ i }}"
+                    name="{{ section.id }}-distance"
+                    value="{{ i }}"
+                    data-text="{{ d_text | escape }}"
+                    {% if d_value == hv_default %}checked{% endif %}
+                  >
+                  <label class="paddi-hv__option" for="{{ section.id }}-d{{ i }}">{{ d_label | escape }}</label>
+                {%- endfor -%}
+              </div>
+
+              <p class="paddi-hv__caption" aria-live="polite" data-hv-caption>
+                {%- case hv_default -%}
+                  {%- when '1' -%}{{ section.settings.d1_text | escape }}
+                  {%- when '3' -%}{{ section.settings.d3_text | escape }}
+                  {%- else -%}{{ section.settings.d2_text | escape }}
+                {%- endcase -%}
+              </p>
+            </fieldset>
+          </div>
+        {%- endif -%}
+      </div>
+
+    </div>
+  </div>
+</paddi-hero-v2>
+
+
+
+{% schema %}
+{
+  "name": "Paddi · Nouveau hero",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "header", "content": "Texte" },
+    { "type": "text", "id": "eyebrow", "label": "Surtitre (dans le titre H1)", "default": "Lanceur de balles automatique pour chien" },
+    { "type": "inline_richtext", "id": "heading", "label": "Titre", "default": "Il joue. <em>Vous soufflez.</em>", "info": "Mettez un mot en italique pour le surligner en orange." },
+    { "type": "richtext", "id": "text", "label": "Texte", "default": "<p>Paddi lance la balle à 3, 6 ou 9 mètres. Votre chien la rapporte, la dépose dans le lanceur, et la partie continue.</p>" },
+    { "type": "header", "content": "Boutons" },
+    { "type": "text", "id": "button_label", "label": "Bouton principal", "default": "Choisir mon Paddi" },
+    { "type": "url", "id": "button_link", "label": "Lien du bouton principal", "info": "Vide : la fiche du produit choisi." },
+    { "type": "checkbox", "id": "scroll_to_buy", "label": "Descendre vers la section Commander si elle est sur la page", "default": true },
+    { "type": "text", "id": "scroll_target", "label": "Ancre de la section Commander", "default": "choisir" },
+    { "type": "text", "id": "secondary_label", "label": "Bouton secondaire", "default": "Le voir en action" },
+    { "type": "url", "id": "secondary_link", "label": "Lien du bouton secondaire", "info": "Vide : descend vers la vidéo (#demo)." },
+    { "type": "header", "content": "Prix" },
+    { "type": "product", "id": "product", "label": "Produit", "info": "Vide : le premier produit de la boutique." },
+    { "type": "checkbox", "id": "show_price", "label": "Afficher le prix sous les boutons", "default": true },
+    { "type": "text", "id": "price_note", "label": "Texte à côté du prix", "default": "Livraison offerte" },
+    { "type": "checkbox", "id": "show_colors", "label": "Afficher les pastilles de couleur", "default": true },
+    { "type": "header", "content": "Visuel" },
+    { "type": "image_picker", "id": "image", "label": "Photo", "info": "Vide : la photo principale du produit." },
+    { "type": "video", "id": "video", "label": "Vidéo (remplace la photo)", "info": "Lue en boucle, sans le son." },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "Format du visuel",
+      "options": [
+        { "value": "auto", "label": "Format d'origine" },
+        { "value": "1.5", "label": "Paysage (3:2)" },
+        { "value": "1.25", "label": "Standard (5:4)" },
+        { "value": "1", "label": "Carré" },
+        { "value": "0.8", "label": "Portrait (4:5)" }
+      ],
+      "default": "auto"
+    },
+    { "type": "text", "id": "media_badge", "label": "Pastille sur la photo", "default": "Une marque qui porte le nom de notre chien" },
+    { "type": "header", "content": "Réglage de distance" },
+    { "type": "checkbox", "id": "show_distance", "label": "Afficher le réglage de distance", "default": true },
+    { "type": "text", "id": "distance_title", "label": "Titre", "default": "Réglez la distance" },
+    {
+      "type": "select",
+      "id": "default_distance",
+      "label": "Distance sélectionnée au départ",
+      "options": [
+        { "value": "1", "label": "Distance 1" },
+        { "value": "2", "label": "Distance 2" },
+        { "value": "3", "label": "Distance 3" }
+      ],
+      "default": "2"
+    },
+    { "type": "text", "id": "d1_label", "label": "Distance 1", "default": "3 m" },
+    { "type": "text", "id": "d1_text", "label": "Texte distance 1", "default": "Environ 3 m : pour jouer dans un petit espace." },
+    { "type": "text", "id": "d2_label", "label": "Distance 2", "default": "6 m" },
+    { "type": "text", "id": "d2_text", "label": "Texte distance 2", "default": "Environ 6 m : le bon réglage pour la plupart des jardins." },
+    { "type": "text", "id": "d3_label", "label": "Distance 3", "default": "9 m" },
+    { "type": "text", "id": "d3_text", "label": "Texte distance 3", "default": "Environ 9 m : pour les grands espaces et les chiens qui aiment courir." },
+    { "type": "header", "content": "Couleurs et marges" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Couleurs de la section", "default": "scheme-1" },
+    { "type": "color_scheme", "id": "card_color_scheme", "label": "Couleurs de la carte de distance", "default": "scheme-2" },
+    { "type": "range", "id": "padding_top", "label": "Marge haute", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "label": "Marge basse", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 72 }
+  ],
+  "blocks": [
+    {
+      "type": "trust",
+      "name": "Garantie",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icône",
+          "options": [
+            { "value": "truck", "label": "Camion" },
+            { "value": "return", "label": "Retour" },
+            { "value": "shield", "label": "Bouclier" },
+            { "value": "ball", "label": "Balle" },
+            { "value": "check", "label": "Coche" }
+          ],
+          "default": "check"
+        },
+        { "type": "inline_richtext", "id": "text", "label": "Texte", "default": "14 jours pour changer d'avis" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Paddi · Nouveau hero",
+      "blocks": [
+        { "type": "trust", "settings": { "icon": "return", "text": "14 jours pour changer d'avis" } },
+        { "type": "trust", "settings": { "icon": "shield", "text": "Garantie légale 2 ans" } },
+        { "type": "trust", "settings": { "icon": "ball", "text": "6 balles incluses" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

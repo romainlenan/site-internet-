@@ -1,0 +1,1128 @@
+{%- comment -%}
+  Paddi · Héros (Nouvelle DA animée)
+  Aplat plein cadre, titre display géant découpé en mots, visuel qui déborde à droite,
+  et une trajectoire de balle : la balle part du lanceur et retombe à 3, 6 ou 9 m selon la
+  distance choisie. Prix, couleurs du produit, bouton principal et garanties restent visibles
+  sans JavaScript et sans animation. Toute la copie vient des réglages et des blocs.
+{%- endcomment -%}
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+{%- liquid
+  assign hv_product = section.settings.product
+  if hv_product == blank
+    assign hv_product = collections.all.products.first
+  endif
+
+  assign hv_image = section.settings.image
+  if hv_image == blank and hv_product != blank
+    assign hv_image = hv_product.featured_image
+  endif
+
+  assign hv_link = section.settings.button_link
+  if hv_link == blank
+    if hv_product != blank
+      assign hv_link = hv_product.url
+    else
+      assign hv_link = routes.all_products_collection_url
+    endif
+  endif
+
+  assign hv_default = section.settings.default_distance | default: '2'
+  assign hv_heading = section.settings.heading | replace: '<em>', '<em class="pf-mark">'
+-%}
+{%- comment -%}
+  Géométrie de la trajectoire (unités du viewBox 0 0 800 300) : départ dans la bouche du lanceur,
+  retombée sur le sol (y 258 = centre de la balle posée). Les mêmes valeurs sont portées par les
+  boutons radio (data-x1, data-cx, data-cy) pour le script.
+{%- endcomment -%}
+{%- liquid
+  assign hv_x0 = 54
+  assign hv_y0 = 196
+  assign hv_y1 = 258
+  case hv_default
+    when '1'
+      assign hv_land = 300
+      assign hv_cx = 177
+      assign hv_cy = 13
+    when '3'
+      assign hv_land = 740
+      assign hv_cx = 397
+      assign hv_cy = -195
+    else
+      assign hv_land = 520
+      assign hv_cx = 287
+      assign hv_cy = -107
+  endcase
+-%}
+
+<paddi-hero-v3
+  class="paddi-section paddi-hero color-{{ section.settings.color_scheme }} gradient{% if section.settings.heading_break %} paddi-hero--break{% endif %}"
+  data-distance="{{ hv_default }}"
+  {% if section.settings.scroll_to_buy %}data-scroll-target="{{ section.settings.scroll_target | default: 'choisir' | handleize }}"{% endif %}
+>
+  <div class="paddi-hero__inner section-{{ section.id }}-padding">
+    <h1 class="paddi-hero__title">
+      {%- if section.settings.eyebrow != blank -%}
+        <span class="paddi-hero__eyebrow pf-label" data-pf-reveal="fade">{{ section.settings.eyebrow | escape }}</span>
+      {%- endif -%}
+      <span class="paddi-hero__headline pf-display-2xl" data-pf-split>{{ hv_heading }}</span>
+    </h1>
+
+    <div class="paddi-hero__stage">
+      <div class="paddi-hero__content">
+        {%- if section.settings.text != blank -%}
+          <div class="paddi-hero__text" data-pf-reveal data-pf-delay="260">{{ section.settings.text }}</div>
+        {%- endif -%}
+
+        {%- comment -%} Prix et couleurs : jamais masqués par une animation. {%- endcomment -%}
+        {%- if section.settings.show_price and hv_product != blank -%}
+          <div class="paddi-hero__buy">
+            <p class="paddi-hero__price">
+              {%- if hv_product.compare_at_price > hv_product.price -%}
+                <span class="visually-hidden">{{ 'products.product.price.sale_price' | t }}</span>
+                <span class="paddi-hero__amount">{{ hv_product.price | money }}</span>
+                <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+                <s class="paddi-hero__compare">{{ hv_product.compare_at_price | money }}</s>
+              {%- else -%}
+                <span class="paddi-hero__amount">{{ hv_product.price | money }}</span>
+              {%- endif -%}
+              {%- if section.settings.price_note != blank -%}
+                <span class="paddi-hero__note"><span class="paddi-hero__dot-ball" aria-hidden="true"></span>{{ section.settings.price_note | escape }}</span>
+              {%- endif -%}
+            </p>
+
+            {%- if section.settings.show_colors -%}
+              {%- for option in hv_product.options_with_values -%}
+                {%- if option.values.size > 1 and option.values.first.swatch -%}
+                  <p class="paddi-hero__colors">
+                    <span class="visually-hidden">{{ option.values.size }} {{ option.name | downcase | escape }}s :</span>
+                    {%- for value in option.values -%}
+                      {%- if value.swatch.color -%}
+                        <span class="paddi-hero__swatch" style="background-color: rgb({{ value.swatch.color.rgb }});" title="{{ value | escape }}"></span>
+                      {%- endif -%}
+                      <span class="visually-hidden">{{ value | escape }}{% unless forloop.last %}, {% endunless %}</span>
+                    {%- endfor -%}
+                  </p>
+                  {%- break -%}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.button_label != blank or section.settings.secondary_label != blank -%}
+          <div class="paddi-hero__actions">
+            {%- if section.settings.button_label != blank -%}
+              <a class="pf-btn paddi-hero__cta" href="{{ hv_link }}" data-hv-cta data-pf-magnetic>
+                <span>{{ section.settings.button_label | escape }}</span>
+                <span class="pf-btn__arrow" aria-hidden="true">→</span>
+              </a>
+            {%- endif -%}
+            {%- if section.settings.secondary_label != blank -%}
+              <a class="pf-btn pf-btn--ghost paddi-hero__secondary" href="{{ section.settings.secondary_link | default: '#demo' }}">
+                <span>{{ section.settings.secondary_label | escape }}</span>
+                <span class="pf-btn__arrow" aria-hidden="true">→</span>
+              </a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        {%- if section.blocks.size > 0 -%}
+          <ul class="paddi-hero__trust" role="list" data-pf-stagger data-pf-delay="420">
+            {%- for block in section.blocks -%}
+              <li class="paddi-hero__trust-item" {{ block.shopify_attributes }}>
+                <span class="paddi-hero__trust-icon" aria-hidden="true">
+                  {%- case block.settings.icon -%}
+                    {%- when 'truck' -%}
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M3 6h11v9H3z"/><path d="M14 9h4l3 3v3h-7z"/><circle cx="7" cy="17" r="1.8"/><circle cx="17" cy="17" r="1.8"/></svg>
+                    {%- when 'return' -%}
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+                    {%- when 'shield' -%}
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+                    {%- when 'ball' -%}
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M4.6 7.4c3 1.6 3 7.6 0 9.2M19.4 7.4c-3 1.6-3 7.6 0 9.2"/></svg>
+                    {%- else -%}
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M5 12l5 5 9-10"/></svg>
+                  {%- endcase -%}
+                </span>
+                <span class="paddi-hero__trust-text">{{ block.settings.text }}</span>
+              </li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      </div>
+
+      {%- comment -%} Visuel qui déborde + terrain de jeu (trajectoire de la balle) {%- endcomment -%}
+      <div class="paddi-hero__visual">
+        {%- liquid
+          assign hv_ratio = section.settings.media_ratio
+          if hv_ratio == 'auto'
+            if section.settings.video != blank
+              assign hv_ratio = section.settings.video.aspect_ratio | default: 1.5
+            elsif hv_image != blank
+              assign hv_ratio = hv_image.aspect_ratio | default: 1.5
+            else
+              assign hv_ratio = 1.5
+            endif
+          endif
+        -%}
+        <div class="paddi-hero__media" style="--hv-ratio: {{ hv_ratio }};">
+          <div class="paddi-hero__media-inner" data-pf-parallax="0.06">
+            {%- if section.settings.video != blank -%}
+              {{
+                section.settings.video
+                | video_tag:
+                  autoplay: true,
+                  loop: true,
+                  muted: true,
+                  controls: false,
+                  playsinline: true,
+                  preload: 'metadata',
+                  image_size: '1500x',
+                  class: 'paddi-hero__video'
+              }}
+            {%- elsif hv_image != blank -%}
+              {%- assign hv_alt = hv_image.alt | default: section.settings.eyebrow -%}
+              {%- assign hv_focal = 'object-position: ' | append: hv_image.presentation.focal_point -%}
+              {{
+                hv_image
+                | image_url: width: 2200
+                | image_tag:
+                  loading: 'eager',
+                  fetchpriority: 'high',
+                  widths: '480, 720, 960, 1200, 1500, 1800, 2200',
+                  sizes: '(min-width: 990px) 62vw, 100vw',
+                  style: hv_focal,
+                  alt: hv_alt
+              }}
+            {%- else -%}
+              {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+            {%- endif -%}
+          </div>
+
+          {%- if section.settings.media_badge != blank -%}
+            <p class="paddi-hero__badge">{{ section.settings.media_badge | escape }}</p>
+          {%- endif -%}
+        </div>
+
+        {%- if section.settings.show_distance -%}
+          <div class="paddi-hero__court">
+            <svg
+              class="paddi-hero__court-svg"
+              viewBox="0 0 800 300"
+              aria-hidden="true"
+              focusable="false"
+              data-hero-court
+              data-x0="{{ hv_x0 }}"
+              data-y0="{{ hv_y0 }}"
+              data-y1="{{ hv_y1 }}"
+            >
+              <defs>
+                <mask id="{{ section.id }}-trail-mask" maskUnits="userSpaceOnUse" x="-40" y="-120" width="880" height="440">
+                  <path class="paddi-hero__mask-path" data-hero-mask d="M{{ hv_x0 }} {{ hv_y0 }} Q{{ hv_cx }} {{ hv_cy }} {{ hv_land }} {{ hv_y1 }}"/>
+                </mask>
+              </defs>
+
+              <line class="paddi-hero__ground" x1="4" y1="272" x2="796" y2="272"/>
+              {%- for i in (1..3) -%}
+                {%- liquid
+                  case i
+                    when 1
+                      assign t_x = 300
+                    when 2
+                      assign t_x = 520
+                    else
+                      assign t_x = 740
+                  endcase
+                -%}
+                <line class="paddi-hero__tick" data-d="{{ i }}" x1="{{ t_x }}" y1="264" x2="{{ t_x }}" y2="282"/>
+                <circle class="paddi-hero__ring" data-d="{{ i }}" cx="{{ t_x }}" cy="272" r="12"/>
+              {%- endfor -%}
+
+              <path class="paddi-hero__trail" data-hero-trail mask="url(#{{ section.id }}-trail-mask)" d="M{{ hv_x0 }} {{ hv_y0 }} Q{{ hv_cx }} {{ hv_cy }} {{ hv_land }} {{ hv_y1 }}"/>
+
+              <g class="paddi-hero__launcher">
+                <path class="paddi-hero__launcher-body" d="M14 272 L28 214 Q31 204 42 204 L66 204 Q77 204 80 214 L94 272 Z"/>
+                <ellipse class="paddi-hero__launcher-mouth" cx="54" cy="208" rx="15" ry="4"/>
+              </g>
+
+              <g class="paddi-hero__ball" data-hero-ball transform="translate({{ hv_land }} {{ hv_y1 }})">
+                <g class="paddi-hero__ball-pop">
+                  <g data-hero-spin>
+                    <circle class="paddi-hero__ball-core" cx="0" cy="0" r="14"/>
+                    <path class="paddi-hero__ball-seam" d="M-10 -9 C-3 -4 -3 4 -10 9 M10 -9 C3 -4 3 4 10 9"/>
+                  </g>
+                </g>
+              </g>
+            </svg>
+
+            <div class="paddi-hero__pills" role="radiogroup" aria-labelledby="{{ section.id }}-distance-title">
+              {%- for i in (1..3) -%}
+                {%- liquid
+                  case i
+                    when 1
+                      assign d_label = section.settings.d1_label
+                      assign d_text = section.settings.d1_text
+                      assign d_x1 = 300
+                      assign d_cx = 177
+                      assign d_cy = 13
+                      assign d_pos = '37.5%'
+                    when 2
+                      assign d_label = section.settings.d2_label
+                      assign d_text = section.settings.d2_text
+                      assign d_x1 = 520
+                      assign d_cx = 287
+                      assign d_cy = -107
+                      assign d_pos = '65%'
+                    else
+                      assign d_label = section.settings.d3_label
+                      assign d_text = section.settings.d3_text
+                      assign d_x1 = 740
+                      assign d_cx = 397
+                      assign d_cy = -195
+                      assign d_pos = '92.5%'
+                  endcase
+                  assign d_value = i | append: ''
+                -%}
+                <input
+                  type="radio"
+                  class="paddi-hero__radio visually-hidden"
+                  id="{{ section.id }}-d{{ i }}"
+                  name="{{ section.id }}-distance"
+                  value="{{ i }}"
+                  data-text="{{ d_text | escape }}"
+                  data-x1="{{ d_x1 }}"
+                  data-cx="{{ d_cx }}"
+                  data-cy="{{ d_cy }}"
+                  {% if d_value == hv_default %}checked{% endif %}
+                >
+                <label class="paddi-hero__option" for="{{ section.id }}-d{{ i }}" style="--x: {{ d_pos }};">
+                  <span class="paddi-hero__option-ball" aria-hidden="true"></span>
+                  <span>{{ d_label | escape }}</span>
+                </label>
+              {%- endfor -%}
+            </div>
+
+            <div class="paddi-hero__card color-{{ section.settings.card_color_scheme }}" data-pf-reveal="fade" data-pf-delay="600">
+              {%- if section.settings.distance_title != blank -%}
+                <p class="paddi-hero__legend pf-label" id="{{ section.id }}-distance-title">{{ section.settings.distance_title | escape }}</p>
+              {%- endif -%}
+              <p class="paddi-hero__caption" aria-live="polite" data-hv-caption>
+                {%- case hv_default -%}
+                  {%- when '1' -%}{{ section.settings.d1_text | escape }}
+                  {%- when '3' -%}{{ section.settings.d3_text | escape }}
+                  {%- else -%}{{ section.settings.d2_text | escape }}
+                {%- endcase -%}
+              </p>
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</paddi-hero-v3>
+
+<script>
+  (function () {
+    if (window.customElements && !customElements.get('paddi-hero-v3')) {
+      var RAF = window.requestAnimationFrame.bind(window);
+
+      customElements.define(
+        'paddi-hero-v3',
+        class PaddiHeroV3 extends HTMLElement {
+          connectedCallback() {
+            if (this._ready) return;
+            this._ready = true;
+            this.t0 = performance.now();
+            this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            this.svg = this.querySelector('[data-hero-court]');
+            this.ball = this.querySelector('[data-hero-ball]');
+            this.spin = this.querySelector('[data-hero-spin]');
+            this.trail = this.querySelector('[data-hero-trail]');
+            this.maskPath = this.querySelector('[data-hero-mask]');
+            this.caption = this.querySelector('[data-hv-caption]');
+
+            this._onChange = (event) => {
+              var input = event.target;
+              if (!input.classList || !input.classList.contains('paddi-hero__radio')) return;
+              this.select(input);
+            };
+            this._onClick = (event) => {
+              var label = event.target.closest && event.target.closest('.paddi-hero__option');
+              if (!label) return;
+              var input = document.getElementById(label.htmlFor);
+              if (input && input.checked && !this.reduced) this.fly(input.value);
+            };
+            this.addEventListener('change', this._onChange);
+            this.addEventListener('click', this._onClick);
+
+            if (this.svg && this.ball && this.maskPath) {
+              this.start = {
+                x: Number(this.svg.dataset.x0) || 54,
+                y: Number(this.svg.dataset.y0) || 196,
+              };
+              this.landY = Number(this.svg.dataset.y1) || 258;
+              if (!this.reduced && 'IntersectionObserver' in window) {
+                this.arm(this.dataset.distance);
+                this.io = new IntersectionObserver(
+                  (entries) => {
+                    if (!entries.some((entry) => entry.isIntersecting)) return;
+                    this.io.disconnect();
+                    this.io = null;
+                    var wait = Math.max(0, 1100 - (performance.now() - this.t0));
+                    this.timer = setTimeout(() => this.fly(this.dataset.distance), wait);
+                  },
+                  { threshold: 0.4 }
+                );
+                this.io.observe(this.svg);
+              } else {
+                this.place(this.dataset.distance);
+              }
+            }
+
+            var cta = this.querySelector('[data-hv-cta]');
+            var targetId = this.dataset.scrollTarget;
+            if (cta && targetId) {
+              this._onCta = (event) => {
+                var target = document.getElementById(targetId);
+                if (!target) return;
+                event.preventDefault();
+                target.scrollIntoView({ behavior: this.reduced ? 'auto' : 'smooth', block: 'start' });
+                var focusable = target.querySelector('input:checked, input, button, a');
+                if (focusable) setTimeout(() => focusable.focus({ preventScroll: true }), this.reduced ? 0 : 600);
+              };
+              this._cta = cta;
+              cta.addEventListener('click', this._onCta);
+            }
+          }
+
+          disconnectedCallback() {
+            this._ready = false;
+            cancelAnimationFrame(this.frame);
+            clearTimeout(this.timer);
+            if (this.io) this.io.disconnect();
+            this.io = null;
+            this.removeEventListener('change', this._onChange);
+            this.removeEventListener('click', this._onClick);
+            if (this._cta) this._cta.removeEventListener('click', this._onCta);
+          }
+
+          geom(value) {
+            var input = this.querySelector('.paddi-hero__radio[value="' + value + '"]');
+            if (!input) return null;
+            return {
+              index: Number(value) || 2,
+              x0: this.start.x,
+              y0: this.start.y,
+              cx: Number(input.dataset.cx),
+              cy: Number(input.dataset.cy),
+              x1: Number(input.dataset.x1),
+              y1: this.landY,
+            };
+          }
+
+          point(g, t) {
+            var u = 1 - t;
+            return {
+              x: u * u * g.x0 + 2 * u * t * g.cx + t * t * g.x1,
+              y: u * u * g.y0 + 2 * u * t * g.cy + t * t * g.y1,
+            };
+          }
+
+          setPath(g) {
+            var d = 'M' + g.x0 + ' ' + g.y0 + ' Q' + g.cx + ' ' + g.cy + ' ' + g.x1 + ' ' + g.y1;
+            this.trail.setAttribute('d', d);
+            this.maskPath.setAttribute('d', d);
+            var length = this.maskPath.getTotalLength();
+            this.maskPath.style.strokeDasharray = length + ' ' + (length + 40);
+            return length;
+          }
+
+          setBall(x, y, angle) {
+            this.ball.setAttribute('transform', 'translate(' + x.toFixed(2) + ' ' + y.toFixed(2) + ')');
+            if (this.spin) this.spin.setAttribute('transform', 'rotate(' + (angle || 0).toFixed(1) + ')');
+          }
+
+          arm(value) {
+            var g = this.geom(value);
+            if (!g) return;
+            var length = this.setPath(g);
+            this.maskPath.style.strokeDashoffset = length;
+            this.setBall(g.x0, g.y0, 0);
+            this.classList.add('is-armed');
+          }
+
+          place(value) {
+            var g = this.geom(value);
+            if (!g) return;
+            this.setPath(g);
+            this.maskPath.style.strokeDashoffset = 0;
+            this.setBall(g.x1, g.y1, 0);
+            this.classList.remove('is-armed');
+          }
+
+          select(input) {
+            this.dataset.distance = input.value;
+            if (this.caption && input.dataset.text) {
+              this.caption.textContent = input.dataset.text;
+              if (!this.reduced) {
+                this.caption.classList.remove('is-new');
+                void this.caption.offsetWidth;
+                this.caption.classList.add('is-new');
+              }
+            }
+            if (!this.svg || !this.maskPath) return;
+            if (this.io) {
+              this.io.disconnect();
+              this.io = null;
+            }
+            if (this.reduced) this.place(input.value);
+            else this.fly(input.value);
+          }
+
+          fly(value) {
+            var g = this.geom(value);
+            if (!g) return;
+            cancelAnimationFrame(this.frame);
+            clearTimeout(this.timer);
+            this.classList.remove('is-landed');
+
+            var length = this.setPath(g);
+            var samples = 48;
+            var table = [0];
+            var previous = this.point(g, 0);
+            for (var s = 1; s <= samples; s++) {
+              var current = this.point(g, s / samples);
+              table.push(table[s - 1] + Math.hypot(current.x - previous.x, current.y - previous.y));
+              previous = current;
+            }
+            var total = table[samples] || 1;
+            var lengthAt = function (t) {
+              var f = t * samples;
+              var i = Math.min(samples - 1, Math.floor(f));
+              return table[i] + (table[i + 1] - table[i]) * (f - i);
+            };
+
+            this.maskPath.style.strokeDashoffset = length;
+            this.setBall(g.x0, g.y0, 0);
+            this.classList.add('is-armed');
+            void this.ball.getBoundingClientRect();
+
+            var duration = 620 + g.index * 170;
+            var turns = 360 * (1 + g.index * 0.6);
+            var startTime = 0;
+            var step = (now) => {
+              if (!startTime) {
+                startTime = now;
+                this.classList.remove('is-armed');
+              }
+              var t = Math.min((now - startTime) / duration, 1);
+              var p = this.point(g, t);
+              this.setBall(p.x, p.y, t * turns);
+              this.maskPath.style.strokeDashoffset = length * (1 - lengthAt(t) / total);
+              if (t < 1) this.frame = RAF(step);
+              else this.bounce(g, turns);
+            };
+            this.frame = RAF(step);
+          }
+
+          bounce(g, angle) {
+            var hops = [
+              { h: 22, dx: 16, d: 260 },
+              { h: 8, dx: 8, d: 170 },
+            ];
+            var hop = 0;
+            var x = g.x1;
+            var startTime = 0;
+            this.classList.add('is-landed');
+            var step = (now) => {
+              if (!startTime) startTime = now;
+              var current = hops[hop];
+              var u = Math.min((now - startTime) / current.d, 1);
+              var px = x + current.dx * u;
+              var py = g.y1 - current.h * 4 * u * (1 - u);
+              this.setBall(px, py, angle + (px - g.x1) * 4);
+              if (u < 1) {
+                this.frame = RAF(step);
+                return;
+              }
+              x += current.dx;
+              hop += 1;
+              startTime = 0;
+              if (hop < hops.length) this.frame = RAF(step);
+            };
+            this.frame = RAF(step);
+          }
+        }
+      );
+    }
+
+    if (!window.paddiHeroV3Bound) {
+      window.paddiHeroV3Bound = true;
+      document.addEventListener('shopify:section:load', function (event) {
+        var root = event.target;
+        if (!root || !root.querySelectorAll) return;
+        root.querySelectorAll('paddi-hero-v3').forEach(function (hero) {
+          if (!hero._ready && typeof hero.connectedCallback === 'function') hero.connectedCallback();
+        });
+      });
+    }
+  })();
+</script>
+
+{% stylesheet %}
+  .paddi-hero {
+    --paddi-hero-gutter: 20px;
+    --paddi-hero-bleed: max(var(--paddi-hero-gutter), calc((100vw - var(--pf-page, 1280px)) / 2));
+    display: block;
+    position: relative;
+    overflow: clip;
+    background-color: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+  }
+  @media screen and (min-width: 750px) {
+    .paddi-hero { --paddi-hero-gutter: 40px; }
+  }
+  .paddi-hero__inner {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: calc(var(--pf-page, 1280px) + 2 * var(--paddi-hero-gutter));
+    margin: 0 auto;
+    padding-left: var(--paddi-hero-gutter);
+    padding-right: var(--paddi-hero-gutter);
+  }
+
+  /* Titre */
+  .paddi-hero__title {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    color: rgb(var(--color-foreground));
+  }
+  .paddi-hero__eyebrow { display: block; color: rgb(var(--color-foreground)); }
+  .paddi-hero__headline {
+    display: block;
+    font-weight: 600;
+    text-transform: uppercase;
+    text-wrap: balance;
+    color: rgb(var(--color-foreground));
+  }
+  .paddi-hero__headline em {
+    font-style: normal;
+    color: rgb(var(--color-button));
+  }
+  .paddi-hero--break .paddi-hero__headline em { display: block; }
+
+  /* Mise en scène */
+  .paddi-hero__stage {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 24px;
+  }
+  .paddi-hero__content { display: contents; }
+  .paddi-hero__visual { order: 4; position: relative; min-width: 0; margin-top: 8px; }
+  .paddi-hero__trust { order: 5; }
+
+  .paddi-hero__text {
+    max-width: 34em;
+    font-size: var(--pf-text-body-lg, 18px);
+    line-height: 1.55;
+    letter-spacing: 0.035em;
+    text-wrap: pretty;
+  }
+  .paddi-hero__text p { margin: 0; }
+  .paddi-hero__text p + p { margin-top: 8px; }
+
+  /* Prix */
+  .paddi-hero__buy {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+  }
+  .paddi-hero__price {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 16px;
+  }
+  .paddi-hero__amount {
+    font-family: var(--pf-font-display, inherit);
+    font-size: clamp(34px, 3vw, 40px);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .paddi-hero__compare {
+    font-size: var(--pf-text-body, 15px);
+    letter-spacing: 0.025em;
+    color: rgba(var(--color-foreground), 0.75);
+  }
+  .paddi-hero__note {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--pf-text-body, 15px);
+    font-weight: 500;
+    letter-spacing: 0.025em;
+  }
+  .paddi-hero__dot-ball {
+    width: 8px;
+    height: 8px;
+    flex: none;
+    border-radius: 50%;
+    background-color: var(--pf-ember, #ff7f00);
+  }
+  .paddi-hero__colors {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .paddi-hero__swatch {
+    box-sizing: border-box;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    border: 1px solid rgba(var(--color-foreground), 0.25);
+  }
+
+  /* Boutons */
+  .paddi-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+  }
+  .paddi-hero__cta { min-height: 56px; }
+
+  /* Garanties en pilules */
+  .paddi-hero__trust {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .paddi-hero__trust-item {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 8px 18px 8px 14px;
+    border: 1px solid rgba(var(--color-foreground), 0.22);
+    border-radius: var(--pf-radius-pill, 60px);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: 0.025em;
+  }
+  .paddi-hero__trust-item p { margin: 0; }
+  .paddi-hero__trust-icon { display: inline-flex; flex: none; color: rgb(var(--color-button)); }
+
+  /* Visuel */
+  .paddi-hero__media {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    aspect-ratio: var(--hv-ratio, 1.5);
+    max-height: 72svh;
+    border-radius: var(--pf-radius-card, 20px);
+    background-color: rgba(var(--color-foreground), 0.06);
+  }
+  .paddi-hero__media-inner { position: absolute; inset: 0; }
+  .paddi-hero__media-inner img,
+  .paddi-hero__media-inner video,
+  .paddi-hero__media-inner .placeholder-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .paddi-hero__badge {
+    position: absolute;
+    z-index: 2;
+    top: 16px;
+    left: 16px;
+    max-width: calc(100% - 32px);
+    margin: 0;
+    padding: 8px 16px;
+    border-radius: var(--pf-radius-pill, 60px);
+    background-color: var(--pf-white, #ffffff);
+    color: var(--pf-cocoa, #321004);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: 0.025em;
+  }
+
+  /* Terrain : la balle sort de la photo et retombe sur l'aplat */
+  .paddi-hero__court {
+    position: relative;
+    z-index: 2;
+    margin-top: -25%;
+  }
+  .paddi-hero__court-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .paddi-hero__ground {
+    stroke: rgba(var(--color-foreground), 0.35);
+    stroke-width: 2;
+    stroke-dasharray: 2 8;
+    stroke-linecap: round;
+  }
+  .paddi-hero__tick {
+    stroke: rgba(var(--color-foreground), 0.35);
+    stroke-width: 2;
+    stroke-linecap: round;
+    transition: stroke 200ms var(--pf-ease-ui, cubic-bezier(0.16, 1, 0.3, 1));
+  }
+  .paddi-hero[data-distance="1"] .paddi-hero__tick[data-d="1"],
+  .paddi-hero[data-distance="2"] .paddi-hero__tick[data-d="2"],
+  .paddi-hero[data-distance="3"] .paddi-hero__tick[data-d="3"] {
+    stroke: var(--pf-ember, #ff7f00);
+    stroke-width: 3;
+  }
+  .paddi-hero__trail {
+    fill: none;
+    stroke: var(--pf-ember, #ff7f00);
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-dasharray: 0.1 13;
+  }
+  .paddi-hero__mask-path {
+    fill: none;
+    stroke: #ffffff;
+    stroke-width: 18;
+    stroke-linecap: round;
+  }
+  .paddi-hero__launcher-body { fill: rgb(var(--color-button)); }
+  .paddi-hero__launcher-mouth { fill: rgb(var(--color-background)); }
+  .paddi-hero__ball-core {
+    fill: var(--pf-ember, #ff7f00);
+    stroke: var(--pf-white, #ffffff);
+    stroke-width: 3;
+  }
+  .paddi-hero__ball-seam {
+    fill: none;
+    stroke: var(--pf-white, #ffffff);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+  }
+  .paddi-hero__ball-pop {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 260ms var(--pf-ease-bounce, cubic-bezier(0.34, 1.56, 0.64, 1));
+  }
+  .paddi-hero.is-armed .paddi-hero__ball-pop {
+    transform: scale(0);
+    transition-duration: 0ms;
+  }
+  .paddi-hero__ring {
+    fill: none;
+    stroke: var(--pf-ember, #ff7f00);
+    stroke-width: 2.5;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .paddi-hero.is-landed[data-distance="1"] .paddi-hero__ring[data-d="1"],
+  .paddi-hero.is-landed[data-distance="2"] .paddi-hero__ring[data-d="2"],
+  .paddi-hero.is-landed[data-distance="3"] .paddi-hero__ring[data-d="3"] {
+    animation: paddi-hero-ring 700ms var(--pf-ease-ui, cubic-bezier(0.16, 1, 0.3, 1)) both;
+  }
+  @keyframes paddi-hero-ring {
+    from { opacity: 1; transform: scale(0.4); }
+    to { opacity: 0; transform: scale(2.4); }
+  }
+
+  /* Sélecteur de distance en pilules */
+  .paddi-hero__pills {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .paddi-hero__option {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 18px 0 14px;
+    border: 1px solid rgba(var(--color-foreground), 0.3);
+    border-radius: var(--pf-radius-pill, 60px);
+    font-family: var(--pf-font-text, inherit);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color 200ms var(--pf-ease-ui, cubic-bezier(0.16, 1, 0.3, 1)),
+      border-color 200ms var(--pf-ease-ui, cubic-bezier(0.16, 1, 0.3, 1)),
+      color 200ms var(--pf-ease-ui, cubic-bezier(0.16, 1, 0.3, 1)),
+      scale 150ms var(--pf-ease-ui, cubic-bezier(0.16, 1, 0.3, 1));
+  }
+  .paddi-hero__option-ball {
+    width: 8px;
+    height: 8px;
+    flex: none;
+    border-radius: 50%;
+    background-color: var(--pf-ember, #ff7f00);
+    scale: 0;
+    transition: scale 260ms var(--pf-ease-bounce, cubic-bezier(0.34, 1.56, 0.64, 1));
+  }
+  @media (hover: hover) {
+    .paddi-hero__option:hover { border-color: rgb(var(--color-foreground)); }
+  }
+  .paddi-hero__option:active { scale: 0.97; }
+  .paddi-hero__radio:checked + .paddi-hero__option {
+    background-color: rgb(var(--color-button));
+    border-color: rgb(var(--color-button));
+    color: rgb(var(--color-button-text));
+  }
+  .paddi-hero__radio:checked + .paddi-hero__option .paddi-hero__option-ball { scale: 1; }
+  .paddi-hero__radio:focus-visible + .paddi-hero__option {
+    outline: 2px solid rgb(var(--color-foreground));
+    outline-offset: 3px;
+  }
+
+  .paddi-hero__card {
+    display: grid;
+    gap: 6px;
+    margin-top: 16px;
+    padding: 16px 20px;
+    border-radius: var(--pf-radius-card, 20px);
+    background-color: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+  }
+  .paddi-hero__legend { margin: 0; }
+  .paddi-hero__caption {
+    margin: 0;
+    min-height: 3em;
+    font-size: var(--pf-text-body, 15px);
+    line-height: 1.5;
+    letter-spacing: 0.025em;
+    text-wrap: pretty;
+  }
+  .paddi-hero__caption.is-new {
+    animation: paddi-hero-caption 400ms var(--pf-ease-ui, cubic-bezier(0.16, 1, 0.3, 1)) both;
+  }
+  @keyframes paddi-hero-caption {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* Intro : la photo monte et se pose (jamais masquée, pour le LCP) */
+  @media (prefers-reduced-motion: no-preference) {
+    html.pf-js .paddi-hero__media {
+      animation: paddi-hero-rise 1000ms var(--pf-ease-drawer, cubic-bezier(0.32, 0.72, 0, 1)) 240ms both;
+    }
+    html.pf-js .paddi-hero__media-inner > img,
+    html.pf-js .paddi-hero__media-inner > video {
+      animation: paddi-hero-zoom 1600ms var(--pf-ease-ui, cubic-bezier(0.16, 1, 0.3, 1)) 240ms both;
+    }
+  }
+  @keyframes paddi-hero-rise {
+    from { transform: translateY(48px) scale(0.97); }
+    to { transform: none; }
+  }
+  @keyframes paddi-hero-zoom {
+    from { transform: scale(1.12); }
+    to { transform: none; }
+  }
+
+  /* Mobile */
+  @media screen and (max-width: 749px) {
+    .paddi-hero__headline { font-size: clamp(48px, 16.5vw, 72px); }
+    .paddi-hero__actions { flex-direction: column; align-items: stretch; gap: 8px; }
+    .paddi-hero__cta { width: 100%; justify-content: center; }
+    .paddi-hero__secondary { justify-content: center; }
+    .paddi-hero__text { font-size: 16px; letter-spacing: 0.025em; }
+    .paddi-hero__option { padding: 0 10px; font-size: 14px; }
+    .paddi-hero__option-ball { display: none; }
+  }
+
+  /* Tablette et plus : les pilules se posent sous leur point de chute */
+  @media screen and (min-width: 750px) {
+    .paddi-hero__media-inner { inset: -12% 0; }
+    .paddi-hero__pills {
+      display: block;
+      position: relative;
+      height: 48px;
+      margin-top: 8px;
+    }
+    .paddi-hero__option {
+      position: absolute;
+      top: 0;
+      left: var(--x);
+      translate: -50% 0;
+      min-width: 84px;
+    }
+    .paddi-hero__card { max-width: 520px; }
+  }
+
+  /* Bureau : texte à gauche, photo qui déborde jusqu'au bord droit */
+  @media screen and (min-width: 990px) {
+    .paddi-hero__stage {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: 40px 60px;
+      align-items: start;
+      margin-top: 36px;
+    }
+    .paddi-hero__content {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      padding-top: 8px;
+    }
+    .paddi-hero__visual { order: 0; margin-top: 0; }
+    .paddi-hero__trust { order: 0; }
+    .paddi-hero__media {
+      width: calc(100% + var(--paddi-hero-bleed));
+      max-height: clamp(320px, 48vh, 580px);
+      border-radius: var(--pf-radius-card, 20px) 0 0 var(--pf-radius-card, 20px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .paddi-hero *,
+    .paddi-hero *::before,
+    .paddi-hero *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+    .paddi-hero.is-armed .paddi-hero__ball-pop { transform: none; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Paddi · Nouveau hero",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "header", "content": "Texte" },
+    { "type": "text", "id": "eyebrow", "label": "Surtitre (dans le titre H1)", "default": "Lanceur de balles automatique pour chien" },
+    { "type": "inline_richtext", "id": "heading", "label": "Titre", "default": "Il joue. <em>Vous soufflez.</em>", "info": "Mettez un mot en italique pour le surligner d'un trait orange." },
+    { "type": "checkbox", "id": "heading_break", "label": "Placer le passage surligné sur sa propre ligne", "default": true },
+    { "type": "richtext", "id": "text", "label": "Texte", "default": "<p>Paddi lance la balle à 3, 6 ou 9 mètres. Votre chien la rapporte, la dépose dans le lanceur, et la partie continue.</p>" },
+    { "type": "header", "content": "Boutons" },
+    { "type": "text", "id": "button_label", "label": "Bouton principal", "default": "Découvrir le lanceur" },
+    { "type": "url", "id": "button_link", "label": "Lien du bouton principal", "info": "Vide : la fiche du produit choisi." },
+    { "type": "checkbox", "id": "scroll_to_buy", "label": "Descendre vers la section Commander si elle est sur la page", "default": true },
+    { "type": "text", "id": "scroll_target", "label": "Ancre de la section Commander", "default": "choisir" },
+    { "type": "text", "id": "secondary_label", "label": "Bouton secondaire", "default": "Le voir en action" },
+    { "type": "url", "id": "secondary_link", "label": "Lien du bouton secondaire", "info": "Vide : descend vers la vidéo (#demo)." },
+    { "type": "header", "content": "Prix" },
+    { "type": "product", "id": "product", "label": "Produit", "info": "Vide : le premier produit de la boutique." },
+    { "type": "checkbox", "id": "show_price", "label": "Afficher le prix sous les boutons", "default": true },
+    { "type": "text", "id": "price_note", "label": "Texte à côté du prix", "default": "Livraison offerte" },
+    { "type": "checkbox", "id": "show_colors", "label": "Afficher les pastilles de couleur", "default": true },
+    { "type": "header", "content": "Visuel" },
+    { "type": "image_picker", "id": "image", "label": "Photo", "info": "Vide : la photo principale du produit." },
+    { "type": "video", "id": "video", "label": "Vidéo (remplace la photo)", "info": "Lue en boucle, sans le son." },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "Format du visuel",
+      "options": [
+        { "value": "auto", "label": "Format d'origine" },
+        { "value": "1.5", "label": "Paysage (3:2)" },
+        { "value": "1.25", "label": "Standard (5:4)" },
+        { "value": "1", "label": "Carré" },
+        { "value": "0.8", "label": "Portrait (4:5)" }
+      ],
+      "default": "auto",
+      "info": "Sur ordinateur, la hauteur du visuel est limitée pour garder le terrain de jeu visible."
+    },
+    { "type": "text", "id": "media_badge", "label": "Pastille sur la photo", "default": "Une marque qui porte le nom de notre chien" },
+    { "type": "header", "content": "Réglage de distance" },
+    { "type": "checkbox", "id": "show_distance", "label": "Afficher le réglage de distance", "default": true, "info": "La balle part du lanceur et retombe à la distance choisie." },
+    { "type": "text", "id": "distance_title", "label": "Titre", "default": "Réglez la distance" },
+    {
+      "type": "select",
+      "id": "default_distance",
+      "label": "Distance sélectionnée au départ",
+      "options": [
+        { "value": "1", "label": "Distance 1" },
+        { "value": "2", "label": "Distance 2" },
+        { "value": "3", "label": "Distance 3" }
+      ],
+      "default": "2"
+    },
+    { "type": "text", "id": "d1_label", "label": "Distance 1", "default": "3 m" },
+    { "type": "text", "id": "d1_text", "label": "Texte distance 1", "default": "Environ 3 m : pour jouer dans un petit espace." },
+    { "type": "text", "id": "d2_label", "label": "Distance 2", "default": "6 m" },
+    { "type": "text", "id": "d2_text", "label": "Texte distance 2", "default": "Environ 6 m : le bon réglage pour la plupart des jardins." },
+    { "type": "text", "id": "d3_label", "label": "Distance 3", "default": "9 m" },
+    { "type": "text", "id": "d3_text", "label": "Texte distance 3", "default": "Environ 9 m : pour les grands espaces et les chiens qui aiment courir." },
+    { "type": "header", "content": "Couleurs et marges" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Couleurs de la section", "default": "scheme-4" },
+    { "type": "color_scheme", "id": "card_color_scheme", "label": "Couleurs de la carte de distance", "default": "scheme-2" },
+    { "type": "range", "id": "padding_top", "label": "Marge haute", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "label": "Marge basse", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 72 }
+  ],
+  "blocks": [
+    {
+      "type": "trust",
+      "name": "Garantie",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icône",
+          "options": [
+            { "value": "truck", "label": "Camion" },
+            { "value": "return", "label": "Retour" },
+            { "value": "shield", "label": "Bouclier" },
+            { "value": "ball", "label": "Balle" },
+            { "value": "check", "label": "Coche" }
+          ],
+          "default": "check"
+        },
+        { "type": "inline_richtext", "id": "text", "label": "Texte", "default": "14 jours pour changer d'avis" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Paddi · Nouveau hero",
+      "blocks": [
+        { "type": "trust", "settings": { "icon": "return", "text": "14 jours pour changer d'avis" } },
+        { "type": "trust", "settings": { "icon": "shield", "text": "Garantie légale 2 ans" } },
+        { "type": "trust", "settings": { "icon": "ball", "text": "6 balles incluses" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,106 @@
+{%- comment -%}
+  Paddi · Nouvelle DA animée : tête de page.
+  - Pose html.pf-js (sauf prefers-reduced-motion) avant le premier rendu : les états
+    initiaux cachés des animations ne s'appliquent que sous cette classe.
+  - Polices auto-hébergées (licence SIL OFL 1.1) : Antonio (« Paddi Condensed », titres display),
+    Inter (« Paddi Text », texte) et JetBrains Mono (« Paddi Mono », micro-étiquettes).
+  - Remappe les anciennes variables --paddi-* vers la nouvelle palette (voir DESIGN.md).
+  - Charge paddi.css PUIS paddi-finn.css (design system), paddi.js et paddi-motion.js.
+  Rendu dans layout/theme.liquid, juste après base.css.
+{%- endcomment -%}
+<script>
+  (function (d) {
+    var html = d.documentElement;
+    try {
+      if (!window.matchMedia || !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        html.classList.add('pf-js');
+        window.setTimeout(function () {
+          if (!html.classList.contains('pf-motion')) html.classList.remove('pf-js');
+        }, 4000);
+      }
+    } catch (e) {}
+  })(document);
+</script>
+{{ 'paddi-antonio-latin-wght.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
+{{ 'paddi-inter-latin-wght.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
+{% style %}
+  @font-face {
+    font-family: 'Paddi Condensed';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url('{{ 'paddi-antonio-latin-wght.woff2' | asset_url }}') format('woff2-variations'), url('{{ 'paddi-antonio-latin-wght.woff2' | asset_url }}') format('woff2');
+    unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+  }
+  @font-face {
+    font-family: 'Paddi Condensed';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url('{{ 'paddi-antonio-latin-ext-wght.woff2' | asset_url }}') format('woff2-variations'), url('{{ 'paddi-antonio-latin-ext-wght.woff2' | asset_url }}') format('woff2');
+    unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF;
+  }
+  @font-face {
+    font-family: 'Paddi Mono';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400;
+    src: url('{{ 'paddi-mono-latin.woff2' | asset_url }}') format('woff2');
+    unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+  }
+  @font-face {
+    font-family: 'Paddi Text';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 100 900;
+    src: url('{{ 'paddi-inter-latin-wght.woff2' | asset_url }}') format('woff2-variations');
+    unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+  }
+  @font-face {
+    font-family: 'Paddi Text';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 100 900;
+    src: url('{{ 'paddi-inter-latin-ext-wght.woff2' | asset_url }}') format('woff2-variations');
+    unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+  }
+  {%- if settings.paddi_custom_fonts %}
+  :root {
+    --font-body-family: 'Paddi Text', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-body-style: normal;
+    --font-body-weight: 400;
+    --font-body-weight-bold: 600;
+    --font-heading-family: 'Paddi Condensed', 'Antonio', 'Arial Narrow', sans-serif;
+    --font-heading-style: normal;
+    --font-heading-weight: 500;
+  }
+  {%- endif %}
+  :root {
+    /* Anciennes variables Paddi remappées sur la nouvelle palette (DESIGN.md).
+       Les teintes qui servaient de texte passent en ink #161345 (contraste ≥ 13:1 sur clair) ;
+       l'orange reste la balle (ponctuation : pastilles, étoiles, lecture vidéo) avec texte ink dessus (7:1). */
+    --paddi-nuit: #161345;
+    --paddi-nuit-profonde: #161345;
+    --paddi-orange: #ff7f00;
+    --paddi-orange-survol: #ff7f00;
+    --paddi-brique: #161345;
+    --paddi-creme: #f9f9f9;
+    --paddi-sauge: #60c4bf;
+    --paddi-sauge-claire: #d7ecff;
+    --paddi-sauge-profonde: #161345;
+    --paddi-ardoise: #595959;
+    --paddi-sable: #ebebeb;
+    --paddi-blanc: #ffffff;
+    --paddi-radius-sm: 12px;
+    --paddi-radius-md: 20px;
+    --paddi-radius-lg: 20px;
+    --paddi-shadow: none;
+  }
+{% endstyle %}
+{% style %}
+  .footer .copyright__content:has(a[href*="shopify.com"]) { display: none; }
+{% endstyle %}
+{{ 'paddi.css' | asset_url | stylesheet_tag }}
+{{ 'paddi-finn.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'paddi.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'paddi-motion.js' | asset_url }}" defer="defer"></script>
