@@ -1,0 +1,31 @@
+{%- comment -%}
+  Logotype Paddi dessiné en SVG (concept « L'arc »).
+  Paramètres :
+  - width : largeur en pixels (défaut 120)
+  - arc : true pour afficher la trajectoire en pointillés
+  - label : texte alternatif (défaut : nom de la boutique)
+  Les lettres prennent la couleur du texte (currentColor), la balle reste orange.
+{%- endcomment -%}
+{%- liquid
+  assign wm_width = width | default: 120
+  assign wm_label = label | default: shop.name | escape
+-%}
+<svg class="paddi-wordmark" width="{{ wm_width }}" viewBox="-6 -22 300 158" role="img" aria-label="{{ wm_label }}" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <g fill="currentColor">
+    <rect x="0" y="44" width="18" height="86" rx="9"/>
+    <rect x="104" y="44" width="18" height="56" rx="9"/>
+    <rect x="170" y="8" width="18" height="92" rx="9"/>
+    <rect x="236" y="8" width="18" height="92" rx="9"/>
+    <rect x="264" y="44" width="18" height="56" rx="9"/>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="18">
+    <circle cx="28" cy="72" r="19"/>
+    <circle cx="94" cy="72" r="19"/>
+    <circle cx="160" cy="72" r="19"/>
+    <circle cx="226" cy="72" r="19"/>
+  </g>
+  {%- if arc -%}
+    <path d="M30 34 Q 150 -46 256 12" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="1 10" stroke-linecap="round" opacity=".55"/>
+  {%- endif -%}
+  <circle cx="273" cy="20" r="11" fill="#FF783F"/>
+</svg>

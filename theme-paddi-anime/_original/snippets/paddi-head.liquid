@@ -1,0 +1,77 @@
+{%- comment -%}
+  Paddi : polices auto-hébergées (Bricolage Grotesque + Inter, licence SIL OFL 1.1),
+  surcharges du design system Dawn, styles et scripts Paddi.
+  Rendu dans layout/theme.liquid, juste après base.css.
+{%- endcomment -%}
+{%- if settings.paddi_custom_fonts -%}
+  {{ 'paddi-inter-latin-wght.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
+  {{ 'paddi-bricolage-latin-wght.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
+  {% style %}
+    @font-face {
+      font-family: 'Paddi Display';
+      font-style: normal;
+      font-display: swap;
+      font-weight: 200 800;
+      src: url('{{ 'paddi-bricolage-latin-wght.woff2' | asset_url }}') format('woff2-variations');
+      unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+    }
+    @font-face {
+      font-family: 'Paddi Display';
+      font-style: normal;
+      font-display: swap;
+      font-weight: 200 800;
+      src: url('{{ 'paddi-bricolage-latin-ext-wght.woff2' | asset_url }}') format('woff2-variations');
+      unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+    }
+    @font-face {
+      font-family: 'Paddi Text';
+      font-style: normal;
+      font-display: swap;
+      font-weight: 100 900;
+      src: url('{{ 'paddi-inter-latin-wght.woff2' | asset_url }}') format('woff2-variations');
+      unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+    }
+    @font-face {
+      font-family: 'Paddi Text';
+      font-style: normal;
+      font-display: swap;
+      font-weight: 100 900;
+      src: url('{{ 'paddi-inter-latin-ext-wght.woff2' | asset_url }}') format('woff2-variations');
+      unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+    }
+    :root {
+      --font-body-family: 'Paddi Text', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --font-body-style: normal;
+      --font-body-weight: 400;
+      --font-body-weight-bold: 600;
+      --font-heading-family: 'Paddi Display', 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+      --font-heading-style: normal;
+      --font-heading-weight: 700;
+    }
+  {% endstyle %}
+{%- endif -%}
+{% style %}
+  :root {
+    --paddi-nuit: #172A3A;
+    --paddi-nuit-profonde: #0F1D29;
+    --paddi-orange: #FF783F;
+    --paddi-orange-survol: #FF8F5F;
+    --paddi-brique: #B84A1C;
+    --paddi-creme: #F7F4EE;
+    --paddi-sauge: #A9BA9C;
+    --paddi-sauge-claire: #E3E9DD;
+    --paddi-sauge-profonde: #56684A;
+    --paddi-ardoise: #56636E;
+    --paddi-sable: #E5DED2;
+    --paddi-blanc: #FFFFFF;
+    --paddi-radius-sm: 8px;
+    --paddi-radius-md: 16px;
+    --paddi-radius-lg: 24px;
+    --paddi-shadow: 0 10px 28px rgba(23, 42, 58, 0.07);
+  }
+{% endstyle %}
+{% style %}
+  .footer .copyright__content:has(a[href*="shopify.com"]) { display: none; }
+{% endstyle %}
+{{ 'paddi.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'paddi.js' | asset_url }}" defer="defer"></script>
