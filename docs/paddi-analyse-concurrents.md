@@ -1,4 +1,4 @@
-# Paddy : analyse des concurrents (lanceurs de balles automatiques pour chien)
+# Paddi : analyse des concurrents (lanceurs de balles automatiques pour chien)
 
 Recherche faite le 23/11/2026, à partir de sources publiques : sites des marques, fiches Zooplus, Zoomalia, Nature & Découvertes, MediaMarkt, Walmart et Target, tests Dogster, PetsRadar, Rover, Reviewed et Consumer Reports.
 Les prix changent souvent : vérifie-les avant de fixer le tien.
@@ -50,9 +50,9 @@ Ce sont les plaintes les plus fréquentes, et aucun concurrent n'y répond dans 
 6. **« Mon chien va devenir obsédé ou se surmener »** : seul PetSafe en parle (mode repos), et seulement en ligne technique.
 7. **Le ton** : tout est froid, technique, ou traduit de l'anglais. Il n'y a **aucune marque française avec une personnalité, un nom attachant et une histoire**.
 
-## 5. Pistes de positionnement pour Paddy (à valider)
+## 5. Pistes de positionnement pour Paddi (à valider)
 
-- **Une marque, pas un gadget** : Paddy a un nom et un ton chaleureux, face à des clones sans âme.
+- **Une marque, pas un gadget** : Paddi a un nom et un ton chaleureux, face à des clones sans âme.
 - **Promesse « il joue dès le premier jour »** : guide d'apprentissage en quelques jours, plus une garantie « satisfait ou remboursé si ton chien n'y joue pas ».
 - **Garantie de 2 ans, SAV en France** : c'est la réponse directe à la peur n°1 (la casse).
 - **Transparence** : vidéos réelles de la portée et du bruit, sans montage.
