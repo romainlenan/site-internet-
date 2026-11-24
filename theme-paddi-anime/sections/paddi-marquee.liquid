@@ -1,0 +1,228 @@
+{%- comment -%}
+  Paddi · Bandeau défilant (Nouvelle DA animée)
+  Grande bande de texte display Antonio (60 à 96 px) qui défile en continu, avec une balle
+  orange qui roule entre chaque élément. Moteur : data-pf-marquee (assets/paddi-motion.js) :
+  le contenu est dupliqué automatiquement, la copie porte aria-hidden : un lecteur d'écran lit
+  la liste une seule fois. Pause au survol, au focus et via le bouton pause (réglable).
+  Sans JavaScript ou en mouvement réduit : les éléments s'affichent centrés, sur plusieurs lignes.
+{%- endcomment -%}
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+  {%- liquid
+    assign pm_speed = section.settings.speed | at_least: 10
+    comment
+      Période de rotation de la balle = circonférence (≈ 0,5 em ≈ 44 px → 138 px) ÷ vitesse :
+      la balle roule à la vitesse exacte du défilement.
+    endcomment
+    assign pm_spin = 138.0 | divided_by: pm_speed
+  -%}
+  #PaddiMarquee-{{ section.id }} {
+    --paddi-marquee-spin: {{ pm_spin | round: 2 }}s;
+  }
+{%- endstyle -%}
+
+{%- liquid
+  assign pm_direction = section.settings.direction | default: 'left'
+-%}
+
+<div
+  id="PaddiMarquee-{{ section.id }}"
+  class="paddi-marquee color-{{ section.settings.color_scheme }} gradient section-{{ section.id }}-padding{% if pm_direction == 'right' %} paddi-marquee--right{% endif %}"
+>
+  {%- if section.blocks.size > 0 -%}
+    <div
+      class="paddi-marquee__band"
+      data-pf-marquee
+      data-pf-speed="{{ pm_speed }}"
+      data-pf-direction="{{ pm_direction }}"
+      {% if section.settings.pause_button %}
+        data-pf-marquee-pause
+      {% endif %}
+    >
+      <ul class="paddi-marquee__list" role="list">
+        {%- for block in section.blocks -%}
+          {%- if block.settings.text != blank -%}
+            <li class="paddi-marquee__item" {{ block.shopify_attributes }}>
+              <span class="paddi-marquee__text">{{ block.settings.text | escape }}</span>
+              <span class="pf-ball pf-ball--seam paddi-marquee__ball" aria-hidden="true"></span>
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+    </div>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .paddi-marquee {
+    position: relative;
+    overflow: hidden;
+    background-color: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+  }
+  .paddi-marquee__band {
+    --pf-marquee-gap: clamp(28px, 3.4vw, 48px);
+    position: relative;
+  }
+  .paddi-marquee__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--pf-marquee-gap);
+    margin: 0;
+    padding: 0 var(--pf-gutter, 20px);
+    list-style: none;
+  }
+  .pf-marquee--ready .paddi-marquee__list {
+    flex-wrap: nowrap;
+    padding: 0;
+  }
+  .paddi-marquee__item {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: var(--pf-marquee-gap);
+    margin: 0;
+  }
+  .paddi-marquee__text {
+    font-family: var(--pf-font-display);
+    font-size: clamp(60px, 7.5vw, 96px);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: rgb(var(--color-foreground));
+  }
+  .paddi-marquee__ball {
+    --pf-ball-size: clamp(30px, 3.4vw, 44px);
+  }
+  /* Sans JavaScript ou en mouvement réduit : liste statique centrée, retour à la ligne permis */
+  .paddi-marquee__band:not(.pf-marquee--ready) .paddi-marquee__item {
+    flex: 0 1 auto;
+    max-width: 100%;
+  }
+  .paddi-marquee__band:not(.pf-marquee--ready) .paddi-marquee__text {
+    font-size: clamp(36px, 7.5vw, 96px);
+    white-space: normal;
+    text-align: center;
+  }
+  /* Avant le démarrage du moteur : une seule ligne, pour éviter un saut de mise en page */
+  html.pf-js .paddi-marquee__band:not(.pf-marquee--ready) {
+    display: block;
+    overflow: hidden;
+  }
+  html.pf-js .paddi-marquee__band:not(.pf-marquee--ready) .paddi-marquee__list {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    padding: 0;
+  }
+  html.pf-js .paddi-marquee__band:not(.pf-marquee--ready) .paddi-marquee__item {
+    flex: none;
+  }
+  html.pf-js .paddi-marquee__band:not(.pf-marquee--ready) .paddi-marquee__text {
+    font-size: clamp(60px, 7.5vw, 96px);
+    white-space: nowrap;
+  }
+  /* La balle roule dans le sens du défilement, à la même vitesse */
+  .pf-marquee--ready .paddi-marquee__ball {
+    animation: paddi-marquee-roll var(--paddi-marquee-spin, 2.3s) linear infinite;
+  }
+  .paddi-marquee--right .pf-marquee--ready .paddi-marquee__ball {
+    animation-direction: reverse;
+  }
+  .pf-marquee--ready:hover .paddi-marquee__ball,
+  .pf-marquee--ready:focus-within .paddi-marquee__ball,
+  .pf-marquee--ready.is-offscreen .paddi-marquee__ball,
+  .pf-marquee--ready.is-user-paused .paddi-marquee__ball {
+    animation-play-state: paused;
+  }
+  @keyframes paddi-marquee-roll {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(-360deg); }
+  }
+  /* Bouton pause du moteur : posé sur le bord droit, au-dessus du texte */
+  .paddi-marquee .pf-marquee__toggle {
+    right: var(--pf-gutter, 20px);
+    border: 1px solid var(--pf-hairline, rgba(var(--color-foreground), 0.16));
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .paddi-marquee__ball,
+    .pf-marquee--ready .paddi-marquee__ball {
+      animation: none !important;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Paddi · Bandeau défilant",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Vitesse de défilement",
+      "min": 10,
+      "max": 160,
+      "step": 10,
+      "unit": "px",
+      "default": 60,
+      "info": "En pixels par seconde."
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Sens du défilement",
+      "options": [
+        { "value": "left", "label": "Vers la gauche" },
+        { "value": "right", "label": "Vers la droite" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_button",
+      "label": "Afficher un bouton pause",
+      "default": true,
+      "info": "Recommandé pour l'accessibilité. Le défilement se met aussi en pause au survol."
+    },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schéma de couleurs", "default": "scheme-3" },
+    { "type": "range", "id": "padding_top", "label": "Marge haute", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 36 },
+    { "type": "range", "id": "padding_bottom", "label": "Marge basse", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 36 }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Élément",
+      "limit": 12,
+      "settings": [
+        { "type": "text", "id": "text", "label": "Texte", "default": "Livraison offerte" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bandeau défilant Paddi",
+      "blocks": [
+        { "type": "item", "settings": { "text": "Livraison offerte" } },
+        { "type": "item", "settings": { "text": "Retours sous 14 jours" } },
+        { "type": "item", "settings": { "text": "Garantie légale 2 ans" } },
+        { "type": "item", "settings": { "text": "6 balles incluses" } },
+        { "type": "item", "settings": { "text": "3, 6 ou 9 mètres" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

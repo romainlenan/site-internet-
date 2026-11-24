@@ -209,7 +209,9 @@
     // Pas de découpage si le titre contient un élément interactif (son nom accessible serait perdu)
     const interactive = el.querySelector('a, button, input, select, textarea');
     if (!reduced && !interactive && !el.hasAttribute('data-pf-split-done')) {
-      const fullText = el.textContent.replace(/\s+/g, ' ').trim();
+      const probe = el.cloneNode(true);
+      probe.querySelectorAll('br').forEach((br) => br.replaceWith(' '));
+      const fullText = probe.textContent.replace(/\s+/g, ' ').trim();
       if (fullText && !el.hasAttribute('aria-label')) el.setAttribute('aria-label', fullText);
       let index = 0;
       const walk = (node) => {

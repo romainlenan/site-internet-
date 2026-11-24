@@ -1,0 +1,104 @@
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.6 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.6 | round: 0 }}px;
+  }
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<div class="paddi-section color-{{ section.settings.color_scheme }} gradient">
+  <div class="page-width section-{{ section.id }}-padding">
+    <div class="paddi-header paddi-header--center">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="paddi-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="paddi-heading">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="paddi-lead">{{ section.settings.text }}</div>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.show_arc -%}
+      <svg class="paddi-arc paddi-steps__arc" viewBox="0 0 800 60" aria-hidden="true" focusable="false">
+        <path d="M60 54 Q 400 -30 740 54" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="1 9" stroke-linecap="round"/>
+        <circle cx="744" cy="55" r="7" fill="#FF783F"/>
+      </svg>
+    {%- endif -%}
+
+    <ol class="paddi-grid paddi-grid--{{ section.blocks.size | at_most: 4 | at_least: 2 }} paddi-steps__list">
+      {%- for block in section.blocks -%}
+        <li class="paddi-step" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank or request.design_mode -%}
+          <div class="paddi-media paddi-media--square">
+            {%- if block.settings.image != blank -%}
+              {{
+                block.settings.image
+                | image_url: width: 800
+                | image_tag: loading: 'lazy', sizes: '(min-width: 750px) 33vw, 30vw', widths: '200, 400, 600, 800', alt: block.settings.image.alt
+              }}
+            {%- else -%}
+              {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+            {%- endif -%}
+          </div>
+          {%- endif -%}
+          <h3 class="paddi-step__title">{{ block.settings.title | escape }}</h3>
+          {%- if block.settings.text != blank -%}<p>{{ block.settings.text | escape }}</p>{%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ol>
+
+    {%- if section.settings.link_label != blank -%}
+      <div class="paddi-steps__footer">
+        <a class="paddi-link" href="{{ section.settings.link_url | default: '/pages/comment-ca-marche' }}">{{ section.settings.link_label | escape }}</a>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Paddi · Étapes",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Surtitre", "default": "Comment ça marche" },
+    { "type": "inline_richtext", "id": "heading", "label": "Titre", "default": "Il dépose. Paddi lance. Il rapporte." },
+    { "type": "richtext", "id": "text", "label": "Texte" },
+    { "type": "checkbox", "id": "show_arc", "label": "Afficher l'arc décoratif", "default": true },
+    { "type": "text", "id": "link_label", "label": "Lien sous les étapes", "default": "Comment lui apprendre : le programme de 7 jours" },
+    { "type": "url", "id": "link_url", "label": "Adresse du lien" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schéma de couleurs", "default": "scheme-4" },
+    { "type": "range", "id": "padding_top", "label": "Marge haute", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "label": "Marge basse", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 80 }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Étape",
+      "limit": 6,
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Photo carrée" },
+        { "type": "text", "id": "title", "label": "Titre", "default": "Il dépose" },
+        { "type": "textarea", "id": "text", "label": "Texte", "default": "Votre chien vous rapporte la balle." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Paddi · Étapes",
+      "blocks": [
+        { "type": "step", "settings": { "title": "Vous déposez", "text": "Déposez la balle dans l'ouverture de Paddi, à la distance choisie." } },
+        { "type": "step", "settings": { "title": "Paddi lance", "text": "L'appareil se prépare automatiquement, puis lance la balle." } },
+        { "type": "step", "settings": { "title": "Il rapporte", "text": "Votre chien file la chercher, vous la rapporte, et la partie continue." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

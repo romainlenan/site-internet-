@@ -1,0 +1,365 @@
+{%- comment -%}
+  Barre d'annonce · Nouvelle DA animée
+  Les annonces (blocs « announcement ») défilent en bande continue (data-pf-marquee),
+  séparées par une petite balle orange. Réglages conservés :
+  - auto_rotate : active le défilement continu (sinon messages centrés, à la suite) ;
+  - change_slides_speed : vitesse du défilement (6 s ≈ 40 px/s ; plus la valeur est basse, plus c'est rapide).
+  Sans JavaScript ou en mouvement réduit : messages centrés, lisibles, sans défilement.
+{%- endcomment -%}
+{%- liquid
+  assign social_icons = true
+  if settings.social_facebook_link == blank and settings.social_instagram_link == blank and settings.social_youtube_link == blank and settings.social_tiktok_link == blank and settings.social_twitter_link == blank and settings.social_pinterest_link == blank and settings.social_snapchat_link == blank and settings.social_tumblr_link == blank and settings.social_vimeo_link == blank
+    assign social_icons = false
+  endif
+  if section.settings.enable_country_selector or section.settings.enable_language_selector
+    assign language_country_selector = true
+  endif
+  if section.blocks.size > 0
+    assign announcement_bar = true
+  endif
+
+  assign pf_marquee = false
+  if section.settings.auto_rotate and section.blocks.size > 0
+    assign pf_marquee = true
+  endif
+  assign pf_speed = 240 | divided_by: section.settings.change_slides_speed
+-%}
+
+{% if social_icons %}
+  {{ 'component-list-social.css' | asset_url | stylesheet_tag }}
+{% endif %}
+
+<div
+  class="utility-bar announcement-bar__pf-bar color-{{ section.settings.color_scheme }} gradient{% if section.settings.show_line_separator and section.blocks.size > 0 %} utility-bar--bottom-border{% elsif section.settings.show_line_separator and section.settings.show_social and social_icons%} utility-bar--bottom-border-social-only{% endif %}{% if section.settings.enable_country_selector or section.settings.enable_language_selector %} header-localization{% endif %}"
+>
+  <div class="page-width utility-bar__grid{% if announcement_bar and language_country_selector or section.settings.show_social and social_icons %} utility-bar__grid--3-col{% elsif language_country_selector or section.settings.show_social and social_icons %} utility-bar__grid--2-col{% endif %}">
+    {%- if section.settings.show_social and social_icons -%}
+      {%- render 'social-icons' -%}
+    {%- endif -%}
+    {%- if section.blocks.size > 0 -%}
+      <div
+        class="announcement-bar announcement-bar--pf{% if pf_marquee %} announcement-bar--pf-marquee{% endif %}{% if section.blocks.size == 1 and section.settings.show_social %} announcement-bar--one-announcement{% endif %}"
+        role="region"
+        aria-label="{{ 'sections.header.announcement' | t }}"
+      >
+        <div
+          class="announcement-bar__pf-rail"
+          {% if pf_marquee %}
+            data-pf-marquee
+            data-pf-speed="{{ pf_speed }}"
+            data-pf-marquee-pause
+          {% endif %}
+        >
+          <ul class="announcement-bar__pf-list list-unstyled" role="list">
+            {%- for block in section.blocks -%}
+              <li class="announcement-bar__pf-item" {{ block.shopify_attributes }}>
+                {%- if block.settings.text != blank -%}
+                  {%- if block.settings.link != blank -%}
+                    <a
+                      href="{{ block.settings.link }}"
+                      class="announcement-bar__link announcement-bar__pf-link link link--text focus-inset"
+                    >
+                  {%- endif -%}
+                  <p class="announcement-bar__message announcement-bar__pf-message">
+                    <span>{{ block.settings.text | escape }}</span>
+                    {%- if block.settings.link != blank -%}
+                      <span class="announcement-bar__pf-arrow" aria-hidden="true">→</span>
+                    {%- endif -%}
+                  </p>
+                  {%- if block.settings.link != blank -%}
+                    </a>
+                  {%- endif -%}
+                  <span class="pf-ball announcement-bar__pf-ball" aria-hidden="true"></span>
+                {%- endif -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      </div>
+    {%- endif -%}
+    <div class="localization-wrapper">
+      {%- if section.settings.enable_country_selector and localization.available_countries.size > 1 -%}
+        <localization-form class="small-hide medium-hide">
+          {%- form 'localization', id: 'AnnouncementCountryForm', class: 'localization-form' -%}
+            <div>
+              <h2 class="visually-hidden" id="AnnouncementCountryLabel">{{ 'localization.country_label' | t }}</h2>
+              {%- render 'country-localization', localPosition: 'AnnouncementCountry' -%}
+            </div>
+          {%- endform -%}
+        </localization-form>
+      {% endif %}
+
+      {%- if section.settings.enable_language_selector and localization.available_languages.size > 1 -%}
+        <localization-form class="small-hide medium-hide">
+          {%- form 'localization', id: 'AnnouncementLanguageForm', class: 'localization-form' -%}
+            <div>
+              <h2 class="visually-hidden" id="AnnouncementLanguageLabel">{{ 'localization.language_label' | t }}</h2>
+              {%- render 'language-localization', localPosition: 'AnnouncementLanguage' -%}
+            </div>
+          {%- endform -%}
+        </localization-form>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .announcement-bar__pf-bar {
+    font-family: var(--pf-font-text, var(--font-body-family));
+  }
+
+  .announcement-bar__pf-bar .utility-bar__grid {
+    min-height: 4.4rem;
+    align-items: center;
+  }
+
+  /* Une seule colonne : la bande défilante occupe toute la largeur */
+  .announcement-bar__pf-bar .utility-bar__grid:not(.utility-bar__grid--2-col):not(.utility-bar__grid--3-col) {
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .announcement-bar--pf {
+    min-width: 0;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .announcement-bar__pf-rail {
+    --pf-marquee-gap: 0px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    min-height: 4.4rem;
+    align-items: center;
+  }
+
+  .announcement-bar__pf-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem 0;
+    margin: 0;
+    padding: 0.6rem 2rem;
+    list-style: none;
+  }
+
+  .announcement-bar__pf-item {
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+  }
+
+  .announcement-bar__pf-message {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin: 0;
+    padding: 0;
+    font-family: var(--pf-font-text, var(--font-body-family));
+    font-size: 1.4rem;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.025em;
+    text-transform: none;
+    color: rgb(var(--color-foreground));
+    white-space: nowrap;
+  }
+
+  .announcement-bar__pf-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 4.4rem;
+    padding: 0 0.4rem;
+    text-decoration: none;
+    color: rgb(var(--color-foreground));
+  }
+
+  .announcement-bar__pf-link:hover .announcement-bar__pf-message span:first-child {
+    text-decoration: underline;
+    text-underline-offset: 0.3rem;
+  }
+
+  .announcement-bar__pf-arrow {
+    display: inline-block;
+    transition: transform 200ms var(--pf-ease-ui, ease-out);
+  }
+
+  .announcement-bar__pf-link:hover .announcement-bar__pf-arrow,
+  .announcement-bar__pf-link:focus-visible .announcement-bar__pf-arrow {
+    transform: translateX(3px);
+  }
+
+  .announcement-bar__pf-ball {
+    --pf-ball-size: 0.8rem;
+    margin: 0 2.4rem;
+  }
+
+  /* Messages à la suite (sans défilement) : pas de balle après le dernier */
+  .announcement-bar__pf-rail:not(.pf-marquee--ready) .announcement-bar__pf-item:last-child .announcement-bar__pf-ball {
+    display: none;
+  }
+
+  /* Bande défilante prête (moteur paddi-motion.js) */
+  .announcement-bar__pf-rail.pf-marquee--ready {
+    justify-content: flex-start;
+    padding-right: 4.4rem;
+  }
+
+  .announcement-bar__pf-rail.pf-marquee--ready .announcement-bar__pf-list {
+    flex-wrap: nowrap;
+    padding: 0;
+  }
+
+  .announcement-bar__pf-rail.pf-marquee--ready .announcement-bar__pf-ball {
+    animation: announcement-bar-pf-hop 2.4s var(--pf-ease-bounce, ease-out) infinite;
+  }
+
+  .announcement-bar__pf-rail.pf-marquee--ready .announcement-bar__pf-item:nth-child(2n) .announcement-bar__pf-ball {
+    animation-delay: 1.2s;
+  }
+
+  .announcement-bar__pf-rail.pf-marquee--ready .pf-marquee__toggle {
+    width: 4.4rem;
+    height: 4.4rem;
+    margin-top: -2.2rem;
+  }
+
+  @keyframes announcement-bar-pf-hop {
+    0%, 70%, 100% { transform: translate3d(0, 0, 0); }
+    80% { transform: translate3d(0, -0.5rem, 0); }
+    90% { transform: translate3d(0, 0, 0) scale(1.15, 0.85); }
+  }
+
+  @media screen and (max-width: 749px) {
+    .announcement-bar__pf-message {
+      font-size: 1.3rem;
+    }
+
+    .announcement-bar__pf-ball {
+      margin: 0 1.6rem;
+    }
+
+    .announcement-bar__pf-rail:not(.pf-marquee--ready) .announcement-bar__pf-message {
+      white-space: normal;
+      text-align: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .announcement-bar__pf-ball,
+    .announcement-bar__pf-rail.pf-marquee--ready .announcement-bar__pf-ball {
+      animation: none !important;
+    }
+
+    .announcement-bar__pf-arrow {
+      transition: none;
+    }
+
+    .announcement-bar__pf-link:hover .announcement-bar__pf-arrow,
+    .announcement-bar__pf-link:focus-visible .announcement-bar__pf-arrow {
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.announcement-bar.name",
+  "max_blocks": 12,
+  "class": "announcement-bar-section",
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "auto_rotate",
+      "label": "t:sections.announcement-bar.settings.auto_rotate.label",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "change_slides_speed",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "label": "t:sections.announcement-bar.settings.change_slides_speed.label",
+      "default": 5
+    },    
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "scheme-4"
+    },  
+    {
+      "type": "checkbox",
+      "id": "show_line_separator",
+      "default": true,
+      "label": "t:sections.header.settings.show_line_separator.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.announcement-bar.settings.heading_utilities.content"
+    },
+    {
+      "type": "paragraph",
+         "content": "t:sections.announcement-bar.settings.paragraph.content"
+    },             
+    {
+      "type": "checkbox",
+      "id": "show_social",
+      "default": false,
+      "label": "t:sections.announcement-bar.settings.show_social.label",
+      "info": "t:sections.announcement-bar.settings.show_social.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_country_selector",
+      "default": false,
+      "label": "t:sections.announcement-bar.settings.enable_country_selector.label",
+      "info": "t:sections.announcement-bar.settings.enable_country_selector.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_language_selector",
+      "default": false,
+      "label": "t:sections.announcement-bar.settings.enable_language_selector.label",
+      "info": "t:sections.announcement-bar.settings.enable_language_selector.info"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "t:sections.announcement-bar.blocks.announcement.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "default": "t:sections.announcement-bar.blocks.announcement.settings.text.default",
+          "label": "t:sections.announcement-bar.blocks.announcement.settings.text.label"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:sections.announcement-bar.blocks.announcement.settings.link.label"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.announcement-bar.presets.name",
+      "blocks": [
+        {
+          "type": "announcement"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

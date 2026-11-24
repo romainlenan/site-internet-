@@ -1,0 +1,654 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "paddi-hero",
+      "blocks": {
+        "trust_X7MtNd": {
+          "type": "trust",
+          "settings": {
+            "icon": "return",
+            "text": "14 jours pour changer d'avis"
+          }
+        },
+        "trust_gYbRek": {
+          "type": "trust",
+          "settings": {
+            "icon": "shield",
+            "text": "Garantie légale 2 ans"
+          }
+        },
+        "trust_JXrERE": {
+          "type": "trust",
+          "settings": {
+            "icon": "ball",
+            "text": "6 balles incluses"
+          }
+        }
+      },
+      "block_order": [
+        "trust_X7MtNd",
+        "trust_gYbRek",
+        "trust_JXrERE"
+      ],
+      "settings": {
+        "eyebrow": "Lanceur de balles automatique pour chien",
+        "heading": "Il joue. <em>Vous soufflez.</em>",
+        "text": "<p>Paddi lance la balle à 3, 6 ou 9 mètres. Votre chien la rapporte, la dépose dans le lanceur, et la partie continue.</p>",
+        "button_label": "Découvrir le lanceur",
+        "button_link": "shopify://collections/all",
+        "scroll_to_buy": true,
+        "scroll_target": "choisir",
+        "secondary_label": "",
+        "secondary_link": "",
+        "product": "lanceur-de-balles-automatique-paddi",
+        "show_price": true,
+        "price_note": "Livraison offerte",
+        "show_colors": true,
+        "media_ratio": "auto",
+        "media_badge": "",
+        "show_distance": true,
+        "distance_title": "Réglez la distance",
+        "default_distance": "2",
+        "d1_label": "3 m",
+        "d1_text": "Environ 3 m : pour jouer dans un petit espace.",
+        "d2_label": "6 m",
+        "d2_text": "Environ 6 m : le bon réglage pour la plupart des jardins.",
+        "d3_label": "9 m",
+        "d3_text": "Environ 9 m : pour les grands espaces et les chiens qui aiment courir.",
+        "color_scheme": "scheme-4",
+        "card_color_scheme": "scheme-2",
+        "padding_top": 48,
+        "padding_bottom": 72
+      }
+    },
+    "video": {
+      "type": "paddi-video",
+      "settings": {
+        "video": "shopify://files/videos/snaptik_7634466256644541709_v3.mp4",
+        "video_url": "",
+        "video_title": "Démonstration du lanceur Paddi",
+        "mobile_vertical": false,
+        "eyebrow": "La démo",
+        "heading": "Voyez Paddi en action.",
+        "text": "",
+        "anchor": "demo",
+        "color_scheme": "scheme-3",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "intro": {
+      "type": "paddi-product-intro",
+      "blocks": {
+        "callout-1": {
+          "type": "callout",
+          "settings": {
+            "title": "3 distances de lancer",
+            "text": "Environ 3, 6 ou 9 m, du couloir au jardin."
+          }
+        },
+        "callout-2": {
+          "type": "callout",
+          "settings": {
+            "title": "6 balles fournies",
+            "text": "Des balles de tennis de 5 cm, à la taille des petits et moyens chiens."
+          }
+        },
+        "callout-3": {
+          "type": "callout",
+          "settings": {
+            "title": "Batterie rechargeable",
+            "text": "Jusqu'à 4 à 5 h par charge selon le fabricant, câble USB fourni."
+          }
+        },
+        "callout-4": {
+          "type": "callout",
+          "settings": {
+            "title": "Un bouton, un interrupteur",
+            "text": "Choisissez la distance, allumez, déposez une balle."
+          }
+        }
+      },
+      "block_order": [
+        "callout-1",
+        "callout-2",
+        "callout-3",
+        "callout-4"
+      ],
+      "settings": {
+        "product": "lanceur-de-balles-automatique-paddi",
+        "image": "shopify://shop_images/Lanceur_orange_et_chien_joueur_c8746efa-ee14-41c5-84f7-839fbc5372e0.png",
+        "eyebrow": "Le lanceur",
+        "heading": "Voici Paddi.",
+        "text": "",
+        "show_price": true,
+        "button_label": "Découvrir le lanceur",
+        "button_link": "shopify://collections/all",
+        "link_label": "Voir toutes les caractéristiques",
+        "link_url": "#caracteristiques",
+        "color_scheme": "scheme-5",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "benefits": {
+      "type": "paddi-benefits",
+      "blocks": {
+        "benefit-1": {
+          "type": "benefit",
+          "settings": {
+            "icon": "ball",
+            "title": "Il joue à la demande",
+            "text": "Votre chien rapporte la balle, vous la déposez, Paddi la relance. Il mène la partie, votre bras se repose."
+          }
+        },
+        "benefit-2": {
+          "type": "benefit",
+          "settings": {
+            "icon": "distance",
+            "title": "Réglé pour son terrain",
+            "text": "Trois distances, environ 3, 6 ou 9 m, du couloir dégagé au jardin."
+          }
+        },
+        "benefit-3": {
+          "type": "benefit",
+          "settings": {
+            "icon": "timer",
+            "title": "Il joue juste",
+            "text": "Des balles à sa taille et des séances courtes conseillées, pour que le jeu reste un plaisir."
+          }
+        },
+        "benefit-4": {
+          "type": "benefit",
+          "settings": {
+            "icon": "chat",
+            "title": "On vous accompagne",
+            "text": "Un programme de 7 jours pour lui apprendre à jouer avec Paddi, pas à pas."
+          }
+        }
+      },
+      "block_order": [
+        "benefit-1",
+        "benefit-2",
+        "benefit-3",
+        "benefit-4"
+      ],
+      "settings": {
+        "eyebrow": "",
+        "heading": "Pourquoi Paddi ?",
+        "text": "",
+        "center": true,
+        "columns": "4",
+        "color_scheme": "scheme-1",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "steps": {
+      "type": "paddi-steps",
+      "blocks": {
+        "step-1": {
+          "type": "step",
+          "settings": {
+            "image": "shopify://shop_images/Golden_Retriever_et_lanceur_de_balle_orange-1.png",
+            "title": "Vous déposez",
+            "text": "Choisissez la distance, allumez Paddi et déposez une balle dans l'ouverture."
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "image": "shopify://shop_images/Lanceur_de_balle_et_chien_joueur.png",
+            "title": "Paddi lance",
+            "text": "L'appareil se prépare automatiquement, puis lance la balle."
+          }
+        },
+        "step-3": {
+          "type": "step",
+          "settings": {
+            "image": "shopify://shop_images/Lanceur_orange_et_chien_joueur.png",
+            "title": "Il rapporte",
+            "text": "Votre chien file la chercher, vous la rapporte, et la partie continue."
+          }
+        }
+      },
+      "block_order": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "settings": {
+        "eyebrow": "Comment ça marche ?",
+        "heading": "Votre chien dépose la balle. Paddi lance. Il rapporte.",
+        "text": "",
+        "show_arc": true,
+        "link_label": "Comment lui apprendre : le programme de 7 jours",
+        "link_url": "/pages/comment-ca-marche",
+        "color_scheme": "scheme-1",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "duo": {
+      "type": "paddi-duo",
+      "blocks": {
+        "column-1": {
+          "type": "column",
+          "settings": {
+            "image": "shopify://shop_images/Retriever_courant_apres_une_balle_de_tennis.png",
+            "title": "Pour lui",
+            "items": "Il court et se dépense\nIl rapporte la balle autant qu'il le souhaite\nIl stimule son instinct de rapport\nIl fait des pauses quand vous le décidez"
+          }
+        },
+        "column-2": {
+          "type": "column",
+          "settings": {
+            "image": "shopify://shop_images/Moments_complices_avec_votre_chien.png",
+            "title": "Pour vous",
+            "items": "Votre bras et votre épaule se reposent\nVous partagez le jeu sans vous épuiser\nVous l'occupez quand le temps est compté\nUn appareil compact, facile à ranger"
+          }
+        }
+      },
+      "block_order": [
+        "column-1",
+        "column-2"
+      ],
+      "settings": {
+        "eyebrow": "Un jeu à deux",
+        "heading": "Le plaisir est partagé.",
+        "color_scheme": "scheme-4",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "specs": {
+      "type": "paddi-specs",
+      "blocks": {
+        "spec-1": {
+          "type": "spec",
+          "settings": {
+            "icon": "distance",
+            "label": "Distances de lancer",
+            "value": "Environ 3, 6 ou 9 m"
+          }
+        },
+        "spec-2": {
+          "type": "spec",
+          "settings": {
+            "icon": "ball",
+            "label": "Balles compatibles",
+            "value": "Balles de tennis de 5 cm"
+          }
+        },
+        "spec-3": {
+          "type": "spec",
+          "settings": {
+            "icon": "battery",
+            "label": "Autonomie annoncée",
+            "value": "Jusqu'à 4 à 5 h par charge"
+          }
+        },
+        "spec-4": {
+          "type": "spec",
+          "settings": {
+            "icon": "usb",
+            "label": "Recharge",
+            "value": "Câble USB fourni"
+          }
+        },
+        "spec-5": {
+          "type": "spec",
+          "settings": {
+            "icon": "size",
+            "label": "Dimensions",
+            "value": "25,65 × 27,43 × 21,34 cm"
+          }
+        },
+        "spec-6": {
+          "type": "spec",
+          "settings": {
+            "icon": "box",
+            "label": "Dans la boîte",
+            "value": "6 balles, câble USB, guide"
+          }
+        }
+      },
+      "block_order": [
+        "spec-1",
+        "spec-2",
+        "spec-3",
+        "spec-4",
+        "spec-5",
+        "spec-6"
+      ],
+      "settings": {
+        "layout": "grid",
+        "eyebrow": "En détail",
+        "heading": "Caractéristiques",
+        "text": "",
+        "center": true,
+        "note": "Données communiquées par le fabricant.",
+        "link_label": "Voir la fiche technique complète",
+        "link_url": "shopify://products/lanceur-de-balles-automatique-paddi",
+        "anchor": "caracteristiques",
+        "color_scheme": "scheme-2",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "gallery": {
+      "type": "paddi-gallery",
+      "blocks": {
+        "photo-1": {
+          "type": "photo",
+          "settings": {
+            "caption": ""
+          }
+        },
+        "photo-2": {
+          "type": "photo",
+          "settings": {
+            "caption": ""
+          }
+        },
+        "photo-3": {
+          "type": "photo",
+          "settings": {
+            "caption": ""
+          }
+        },
+        "photo-4": {
+          "type": "photo",
+          "settings": {
+            "caption": ""
+          }
+        },
+        "photo-5": {
+          "type": "photo",
+          "settings": {
+            "caption": ""
+          }
+        },
+        "photo-6": {
+          "type": "photo",
+          "settings": {
+            "caption": ""
+          }
+        }
+      },
+      "block_order": [
+        "photo-1",
+        "photo-2",
+        "photo-3",
+        "photo-4",
+        "photo-5",
+        "photo-6"
+      ],
+      "disabled": true,
+      "settings": {
+        "eyebrow": "En situation",
+        "heading": "Ils jouent avec Paddi.",
+        "text": "",
+        "center": true,
+        "layout": "mosaic",
+        "show_captions": true,
+        "radius": 16,
+        "footnote": "",
+        "color_scheme": "scheme-1",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "reviews": {
+      "type": "paddi-reviews",
+      "blocks": {
+        "testimonial_wEnQLU": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "quote": "<p>Très bonne surprise. Mon chien a compris rapidement comment ça fonctionne et il s’amuse énormément avec.</p>",
+            "author": "Thomas R.",
+            "dog": "Border Collie, 18 kg",
+            "date": "8 novembre 2026",
+            "verified": true
+          }
+        },
+        "testimonial_RGh3jc": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "quote": "<p>Il devient fou dès qu'il voit le lanceur 😂</p>",
+            "author": "Yasmine B.",
+            "dog": "Golden Retriever, 37 kg",
+            "date": "12 novembre 2026",
+            "verified": true
+          }
+        },
+        "testimonial_GMpBBL": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 4,
+            "quote": "<p>Le produit est facile à prendre en main et mon chien a vite montré de l’intérêt. Il a fallu quelques essais avant qu’il comprenne bien le fonctionnement, mais maintenant il joue volontiers avec. Très contente de mon achat.</p>",
+            "author": "Julie P.",
+            "dog": "Cocker Anglais, 14 kg",
+            "date": "3 novembre 2026",
+            "verified": true
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_wEnQLU",
+        "testimonial_RGh3jc",
+        "testimonial_GMpBBL"
+      ],
+      "settings": {
+        "eyebrow": "Avis clients",
+        "heading": "Ils ont lancé la partie.",
+        "method_text": "Les avis sont recueillis après chaque commande, auprès des acheteurs.",
+        "method_link_label": "",
+        "method_link": "/pages/faq",
+        "color_scheme": "scheme-3",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "compare": {
+      "type": "paddi-comparison",
+      "blocks": {
+        "row-1": {
+          "type": "row",
+          "settings": {
+            "label": "Votre bras se repose",
+            "values": "non | oui | oui"
+          }
+        },
+        "row-2": {
+          "type": "row",
+          "settings": {
+            "label": "Distance réglable",
+            "values": "non | Variable | 3 distances"
+          }
+        },
+        "row-3": {
+          "type": "row",
+          "settings": {
+            "label": "Balles fournies",
+            "values": "non | Variable | 6 balles de 5 cm"
+          }
+        },
+        "row-4": {
+          "type": "row",
+          "settings": {
+            "label": "Batterie rechargeable",
+            "values": "non | Variable | oui"
+          }
+        },
+        "row-5": {
+          "type": "row",
+          "settings": {
+            "label": "Programme d'apprentissage en français",
+            "values": "non | Variable | oui"
+          }
+        },
+        "row-6": {
+          "type": "row",
+          "settings": {
+            "label": "Livraison offerte",
+            "values": "non | Variable | oui"
+          }
+        }
+      },
+      "block_order": [
+        "row-1",
+        "row-2",
+        "row-3",
+        "row-4",
+        "row-5",
+        "row-6"
+      ],
+      "settings": {
+        "eyebrow": "Comparer",
+        "heading": "Lancer à la main ou avec Paddi ?",
+        "text": "<p>Sur mobile, faites défiler le tableau horizontalement pour comparer toutes les options.</p>",
+        "col_1": "Lancer à la main",
+        "col_2": "Lanceur générique",
+        "col_3": "Paddi",
+        "col_4": "",
+        "note": "« Variable » : cela dépend du modèle et du vendeur.",
+        "color_scheme": "scheme-5",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "faq": {
+      "type": "paddi-faq",
+      "blocks": {
+        "question-1": {
+          "type": "question",
+          "settings": {
+            "question": "Pour quelle taille de chien ?",
+            "answer": "<p>Paddi lance des balles de tennis de 5 cm, plus petites que les balles classiques. Il est pensé pour les petits et moyens chiens. Pour un grand chien, une balle de cette taille peut être avalée : nous vous disons de surveiller votre chien lors de son utilisation dans ce cas.</p>"
+          }
+        },
+        "question-2": {
+          "type": "question",
+          "settings": {
+            "question": "Mon chien va-t-il comprendre ?",
+            "answer": "<p>S'il aime déjà rapporter la balle, il comprend souvent en quelques séances courtes, avec des friandises et beaucoup d'encouragements. Notre <a href=\"/pages/comment-ca-marche\">programme de 7 jours</a> vous guide pas à pas. Certains chiens ont besoin de plus de temps, d'autres ne s'y intéressent pas : chaque chien est différent.</p>"
+          }
+        },
+        "question-3": {
+          "type": "question",
+          "settings": {
+            "question": "Quelles balles utiliser ?",
+            "answer": "<p>Des balles de tennis de 5 cm, propres et sèches. Six balles sont fournies. Évitez les balles abîmées, humides, sales ou en caoutchouc : elles peuvent bloquer l'appareil.</p>"
+          }
+        },
+        "question-4": {
+          "type": "question",
+          "settings": {
+            "question": "Quelle est l'autonomie de la batterie ?",
+            "answer": "<p>Le fabricant annonce jusqu'à 4 à 5 heures d'utilisation par charge, selon l'usage. La recharge se fait avec le câble USB fourni. Paddi ne fonctionne pas pendant sa recharge.</p>"
+          }
+        },
+        "question-5": {
+          "type": "question",
+          "settings": {
+            "question": "Est-ce bruyant ?",
+            "answer": "<p>Comme tout lanceur, Paddi fait du bruit au moment de lancer la balle. Si votre chien y est sensible, habituez-le d'abord à l'appareil éteint, puis utilisez la distance la plus courte en récompensant son calme.</p>"
+          }
+        },
+        "question-6": {
+          "type": "question",
+          "settings": {
+            "question": "Est-ce sans danger ?",
+            "answer": "<p>Restez présent pendant le jeu, apprenez à votre chien à se tenir derrière ou à côté de l'appareil, et ne placez jamais la main dans l'ouverture de lancement. Préférez plusieurs séances courtes, et arrêtez le jeu si votre chien s'épuise ou ne pense plus qu'à la balle.</p>"
+          }
+        },
+        "question-7": {
+          "type": "question",
+          "settings": {
+            "question": "Quels sont les délais de livraison ?",
+            "answer": "<p>La livraison est offerte en France métropolitaine, sous 5 à 7 jours ouvrés. Vous recevez un e-mail avec le lien de suivi dès l'expédition.</p>"
+          }
+        },
+        "question-8": {
+          "type": "question",
+          "settings": {
+            "question": "Puis-je le retourner ?",
+            "answer": "<p>Oui. Vous disposez de 14 jours après réception pour vous rétracter, sans justification, depuis notre page <a href=\"/pages/retractation\">Rétractation</a>. Nous vous remboursons dans les 14 jours suivant votre demande, une fois le produit reçu en retour ou la preuve de son expédition fournie.</p>"
+          }
+        },
+        "question-9": {
+          "type": "question",
+          "settings": {
+            "question": "Quelle est la garantie ?",
+            "answer": "<p>Paddi bénéficie de la garantie légale de conformité de 2 ans. En cas de problème, <a href=\"/pages/contact\">contactez-nous</a> avec une courte vidéo : nous vous proposons une solution, réparation ou remplacement.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "question-1",
+        "question-2",
+        "question-3",
+        "question-4",
+        "question-5",
+        "question-6",
+        "question-7",
+        "question-8",
+        "question-9"
+      ],
+      "disabled": true,
+      "settings": {
+        "eyebrow": "Questions fréquentes",
+        "heading": "Vos questions, nos réponses.",
+        "text": "",
+        "link_label": "Toutes les questions",
+        "link_url": "/pages/faq",
+        "open_first": false,
+        "structured_data": true,
+        "anchor": "faq",
+        "color_scheme": "scheme-1",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "cta": {
+      "type": "paddi-cta",
+      "settings": {
+        "heading": "Prêt à lancer la partie ?",
+        "text": "",
+        "button_label": "Découvrir le lanceur",
+        "button_link": "shopify://products/lanceur-de-balles-automatique-paddi",
+        "trust": "Livraison offerte · Retours sous 14 jours · Garantie légale 2 ans",
+        "show_arc": true,
+        "color_scheme": "scheme-7",
+        "padding_top": 88,
+        "padding_bottom": 88
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "video",
+    "intro",
+    "benefits",
+    "steps",
+    "duo",
+    "specs",
+    "gallery",
+    "reviews",
+    "compare",
+    "faq",
+    "cta"
+  ]
+}

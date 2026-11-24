@@ -1,0 +1,125 @@
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.6 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.6 | round: 0 }}px;
+  }
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+{%- liquid
+  assign has_video = false
+  if section.settings.video != blank or section.settings.video_url != blank
+    assign has_video = true
+  endif
+  assign poster = section.settings.poster
+  if poster == blank and section.settings.video != blank
+    assign poster = section.settings.video.preview_image
+  endif
+-%}
+
+{%- if has_video or request.design_mode -%}
+<div id="{{ section.settings.anchor | default: 'demo' | handleize }}" class="paddi-section color-{{ section.settings.color_scheme }} gradient">
+  <div class="page-width section-{{ section.id }}-padding">
+    <div class="paddi-header paddi-header--center">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="paddi-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="paddi-heading">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="paddi-lead">{{ section.settings.text }}</div>
+      {%- endif -%}
+    </div>
+
+    <paddi-video class="paddi-media paddi-media--landscape paddi-video__frame{% if section.settings.mobile_vertical %} paddi-video--mobile-vertical{% endif %}">
+      {%- if has_video -%}
+        <button type="button" class="paddi-video__poster" aria-label="{{ 'paddi.video.play' | t: title: section.settings.video_title | escape }}">
+          {%- if poster != blank -%}
+            {{ poster | image_url: width: 1600 | image_tag: loading: 'lazy', sizes: '(min-width: 1100px) 1000px, 100vw', widths: '600, 900, 1200, 1600', alt: '' }}
+          {%- else -%}
+            {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+          {%- endif -%}
+          <span class="paddi-video__play">{% render 'paddi-icon', icon: 'play', size: 32 %}</span>
+        </button>
+        <template>
+          {%- if section.settings.video != blank -%}
+            {{ section.settings.video | video_tag: controls: true, playsinline: true, preload: 'none' }}
+          {%- elsif section.settings.video_url.type == 'youtube' -%}
+            <iframe
+              src="https://www.youtube-nocookie.com/embed/{{ section.settings.video_url.id }}?autoplay=1&rel=0"
+              title="{{ section.settings.video_title | escape }}"
+              allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+              allowfullscreen
+            ></iframe>
+          {%- elsif section.settings.video_url.type == 'vimeo' -%}
+            <iframe
+              src="https://player.vimeo.com/video/{{ section.settings.video_url.id }}?autoplay=1&dnt=1"
+              title="{{ section.settings.video_title | escape }}"
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          {%- endif -%}
+        </template>
+      {%- else -%}
+        {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+        <p class="paddi-placeholder-note">{{ 'paddi.editor.video' | t }}</p>
+      {%- endif -%}
+    </paddi-video>
+
+    {%- if section.blocks.size > 0 -%}
+      <ul class="paddi-chips" role="list">
+        {%- for block in section.blocks -%}
+          <li class="paddi-chip" {{ block.shopify_attributes }}>{{ block.settings.label | escape }}</li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+</div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Paddi · Vidéo",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "video", "id": "video", "label": "Vidéo hébergée sur Shopify", "info": "Prioritaire. Conseillé : démo de 45 s, en un seul plan, avec le son réel." },
+    { "type": "video_url", "id": "video_url", "label": "Ou lien YouTube / Vimeo", "accept": ["youtube", "vimeo"] },
+    { "type": "image_picker", "id": "poster", "label": "Image d'aperçu" },
+    { "type": "text", "id": "video_title", "label": "Titre de la vidéo (accessibilité)", "default": "Démonstration du lanceur Paddi" },
+    { "type": "checkbox", "id": "mobile_vertical", "label": "Format vertical 9:16 sur mobile", "default": false },
+    { "type": "text", "id": "eyebrow", "label": "Surtitre", "default": "La démo" },
+    { "type": "inline_richtext", "id": "heading", "label": "Titre", "default": "45 secondes, sans montage. Avec le vrai son." },
+    { "type": "richtext", "id": "text", "label": "Texte" },
+    { "type": "text", "id": "anchor", "label": "Ancre", "default": "demo", "info": "Permet aux boutons « Voir la démo » de descendre jusqu'ici (#demo)." },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schéma de couleurs", "default": "scheme-3" },
+    { "type": "range", "id": "padding_top", "label": "Marge haute", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "label": "Marge basse", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 80 }
+  ],
+  "blocks": [
+    {
+      "type": "chapter",
+      "name": "Chapitre",
+      "limit": 6,
+      "settings": [{ "type": "text", "id": "label", "label": "Libellé", "default": "Réglages" }]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Paddi · Vidéo",
+      "blocks": [
+        { "type": "chapter", "settings": { "label": "Déballage" } },
+        { "type": "chapter", "settings": { "label": "Réglages" } },
+        { "type": "chapter", "settings": { "label": "Première séance" } },
+        { "type": "chapter", "settings": { "label": "Séance au jardin" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

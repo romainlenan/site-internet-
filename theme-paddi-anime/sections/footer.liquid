@@ -319,7 +319,75 @@
       </div>
     </div>
   </div>
+
+  {%- if section.settings.pf_show_wordmark -%}
+    {%- liquid
+      assign pf_wordmark = section.settings.pf_wordmark_text
+      if pf_wordmark == blank
+        assign pf_wordmark = shop.name
+      endif
+    -%}
+    <div class="footer__pf-wordmark page-width" data-pf-progress="enter" aria-hidden="true">
+      <span class="footer__pf-wordmark-inner">
+        <span class="footer__pf-wordmark-text">{{ pf_wordmark | escape }}</span>
+        <span class="pf-ball footer__pf-wordmark-ball"></span>
+      </span>
+    </div>
+  {%- endif -%}
 </footer>
+
+{% stylesheet %}
+  .footer__pf-wordmark {
+    --pf-p: var(--pf-progress, 1);
+    display: flex;
+    justify-content: center;
+    margin-top: 4rem;
+    padding-top: 2rem;
+    overflow: hidden;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .footer__pf-wordmark-inner {
+    position: relative;
+    display: inline-block;
+    font-family: var(--pf-font-display, var(--font-heading-family));
+    font-size: clamp(9rem, 26vw, 38rem);
+    font-weight: 600;
+    line-height: 0.8;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .footer__pf-wordmark-text {
+    display: block;
+    color: rgb(var(--color-foreground));
+    transform: translate3d(0, calc((1 - var(--pf-p)) * 45%), 0);
+    opacity: calc(0.3 + var(--pf-p) * 0.7);
+  }
+
+  /* La balle arrive en arc au-dessus du mot-symbole, pilotée par le défilement */
+  .footer__pf-wordmark-ball {
+    --pf-ball-size: 0.17em;
+    position: absolute;
+    top: -0.06em;
+    right: -0.14em;
+    transform: translate3d(
+      calc((1 - var(--pf-p)) * -900%),
+      calc(var(--pf-p) * (1 - var(--pf-p)) * -1200% + (1 - var(--pf-p)) * 200%),
+      0
+    );
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .footer__pf-wordmark-text,
+    .footer__pf-wordmark-ball {
+      transform: none !important;
+      opacity: 1 !important;
+    }
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
@@ -491,6 +559,23 @@
       "default": true,
       "label": "t:sections.footer.settings.show_policy.label",
       "info": "t:sections.footer.settings.show_policy.info"
+    },
+    {
+      "type": "header",
+      "content": "Mot-symbole"
+    },
+    {
+      "type": "checkbox",
+      "id": "pf_show_wordmark",
+      "default": true,
+      "label": "Afficher le grand mot-symbole en bas du pied de page",
+      "info": "Décoratif, animé au défilement. Le nom de la boutique est utilisé si le texte est vide."
+    },
+    {
+      "type": "text",
+      "id": "pf_wordmark_text",
+      "label": "Texte du mot-symbole",
+      "placeholder": "Paddi"
     },
     {
       "type": "header",
